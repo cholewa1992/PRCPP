@@ -1,0 +1,155 @@
+\documentclass{tufte-handout}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{gray75}{gray}{0.75}
+\definecolor{light-gray}{gray}{0.5}
+
+\lstset{
+  frame=,
+  language=java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=4
+}
+
+
+\setcounter{secnumdepth}{3}
+\renewcommand{\thesection}{}
+\renewcommand{\thesubsection}{Exercise \arabic{section}.\arabic{subsection}}
+
+\pagestyle{empty}
+
+
+\title{PRCPP week 1}
+\author{Jacob Cholewa (jbec@itu.dk)}
+
+\begin{document}
+  \maketitle
+
+  \section{}
+
+  
+  \subsection{} \label{subsec:e11}
+
+  \begin{enumerate}
+    \item The value returned will probably be less than $20.000.00$. This is because the increment operation is not atomic. Fx. $T1$ reads the value $2$. $T2$ reads the value $2$, increments and writes $3$. $T1$ have already read the value and then increments and writes $3$ resulting in a missed increment.
+
+    \item Because only few operations are performed it's less likely that an interleaved increment will occur. That does not make the code correct as an interleaved increment can still occur, making the code unsafe.
+
+    \item An increment operation non-atomic no matter the syntax used.
+
+    \item The code is supposed to return 0. When run without \texttt{synchronized} the result will be wrong. This is for the same reason as with exercise 1.1.1 as decrement is also three operations. Read, subtract and write. For the code to be correct increment, decrement and get needs to be \texttt{synchronized}.
+
+    \item
+      \begin{enumerate}[i]
+        \item The result is quite random and not close to the correct result as expected. The result is sometimes negative and sometimes positive. (-9802563, -25426, 46669)
+        \item Same as before. (22142, -14113, 6654)
+        \item Same as before. (-23635, -23738, -15948)
+        \item The result is now correct as expected. (0,0,0,...)
+      \end{enumerate}
+  \end{enumerate}
+
+  \subsection {}
+
+  \begin{enumerate}
+    \item It can be the case that thread $t1$ just awoke and prints a \texttt{|}. At the same time $t2$ awoke and prints a \texttt{|} before $t1$ prints its \texttt{-}. This results in a \texttt{-||-} instead of the desired \texttt{-|-|}
+
+    \begin{fullwidth}
+      \begin{lstlisting}
+        public class Printer {
+            public static void main(String[] args){
+                Printer p = new Printer();
+                Thread t1 = new Thread(() -> { while(true) p.print(); });
+                Thread t2 = new Thread(() -> { while(true) p.print(); });
+                t1.start(); t2.start();
+            }
+
+            public void print() {
+                System.out.print("-");
+                try { Thread.sleep(50); } catch (InterruptedException exn) { }
+                System.out.print("|");        
+            }
+        }
+      \end{lstlisting}
+    \end{fullwidth}
+
+    \item If the print operation is \texttt{synchronized} then the print operation of printing \texttt{-|} will be atomic. This will prevent wrong sequences as from exercise 2.1.1
+
+    \begin{lstlisting}
+      public synchronized void print() {
+          System.out.print("-");
+          try { Thread.sleep(50); } catch (InterruptedException exn) { }
+          System.out.print("|");
+      }
+    \end{lstlisting}
+  
+
+    \item The print method can be rewritten so that the synchronized statement is in the body. This is shown in the following code example.
+
+    \begin{fullwidth}
+      \begin{lstlisting}
+        public void print() {
+            synchronized(this){
+                System.out.print("-");
+                try { Thread.sleep(50); } catch (InterruptedException exn) { }
+                System.out.print("|");
+            }
+        }
+      \end{lstlisting}
+    \end{fullwidth}
+
+    \item The code can be rewritten to be static in this way
+    \begin{fullwidth}
+      \begin{lstlisting}
+        ...
+        public static void print() {
+            synchronized(Printer.class){
+                System.out.print("-");
+                try { Thread.sleep(50); } catch (InterruptedException exn) { }
+                System.out.print("|");
+            }
+        }
+      \end{lstlisting}
+    \end{fullwidth}
+  \end{enumerate}
+
+
+\subsection{}
+
+\begin{enumerate}
+  \item I'm experience the same problems as the lecture as it loops indefinitely.
+  \item As expected the code now terminates as expected. This is due to the fact that synchronize guarantees that everything visible to the thread that just released lock $m$ will be visible to the thread that just acquired lock $m$.
+  \item The code does not work because visibility is only guaranteed if the thread acquires a lock, which the main thread does not.
+  \item The volatile guarantees visibility between threads which is what's needed for the code to work correctly.
+\end{enumerate}
+
+\subsection{}
+
+\begin{enumerate}
+  \item The sequential version takes 7,2 seconds to execute.
+  \item The code using 10 threads take 2,9 seconds to execute.
+  \item The execution time is the same as without the synchronization, but the calculated result is wrong
+  \item I'm not completely sure. When I execute it without it still returns the correct result. I would guess that it is needed, as the variable change might be invisible to the main thread, but that the problem is not occurring for me now, but could potentially occur.
+\end{enumerate}
+\end{document}
