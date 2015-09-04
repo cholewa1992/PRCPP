@@ -1,0 +1,84 @@
+\documentclass{tufte-handout}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{gray75}{gray}{0.75}
+\definecolor{light-gray}{gray}{0.5}
+
+\lstset{
+  frame=,
+  language=java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=4
+}
+
+
+\setcounter{secnumdepth}{3}
+\renewcommand{\thesection}{}
+\renewcommand{\thesubsection}{Exercise \arabic{section}.\arabic{subsection}}
+
+\pagestyle{empty}
+
+
+\title{PRCPP week 2}
+\author{Jacob Cholewa (jbec@itu.dk)}
+
+\setcounter{section}{1}
+\begin{document}
+  \maketitle
+
+  \section{}
+
+  
+  \subsection{}
+
+  \begin{enumerate}
+    \item It takes $7,3$ seconds. The code can be seen in \texttt{SequentialFactorCount.java}
+    \item The code can be seen in \texttt{MyAtomicInteger.java}
+    \item The result is still $18,703,729$ and the runtime using \texttt{ConcurrentFactorCount.java} is $3,5$ seconds.
+    \item No. The method has to be synchronized as the addAndGet operation is atomic.
+    \item The consumed time is the same. The \texttt{AtomicInteger} can, but does not have to be declared final
+
+  \end{enumerate}
+
+  \subsection{}
+
+  \begin{enumerate}
+    \item It is important as it ensured visibility of the \texttt OneValueCache object between threads.
+    \item As the object is already immutable (The values of \texttt lastNumber and \texttt lastFactors can't be changed regardless of it being \texttt final or not) it is important because of visibility. The \texttt final keyword ensured visibility after the constructor has finished. If the \texttt final keyword is not used visibility of the objects values is not ensured between threads.
+  \end{enumerate}
+
+  \subsection{}
+
+    \begin{enumerate}
+      \item \texttt count should be \texttt final as it will never change and because it ensures visibility. \texttt increment and \texttt getCount needs to be \texttt synchronized to ensure visibility and because the increment operation is atomic. \texttt getSpan does not have to be synchronized as counts is final.
+      \item The code is implemented in \texttt ConcurrentFactorHistogram.java
+      \item There is a slight advantage of using \texttt AtomicIntegers with a time difference of between $100ms$ and $200ms$.
+      \item The version using \texttt Histogram4 return a correct result. (\texttt diff against \texttt check.out)
+      \item For Histogram2 I return a clone of the internal array. For Histogram3 and Histogram4 i copy the values into a new int array and return that. All three provides a snapshot.
+      \item The code is implemented in \texttt ConcurrentFactorHistogram.java
+    \end{enumerate}
+
+
+\end{document}
