@@ -1,18 +1,19 @@
 #!/bin/bash
+NAME=jbec
 case "$1" in
 
 	clean)
-		rm -f *-jbec.zip
+		rm -f *-$NAME.zip
 		;;
 
         [1-9])
                 if [ -d "prcpp-week0$1" ]; then
-                        mkdir -p prcpp-week0$1-jbec/src
-                        find prcpp-week0$1 -name "*.java" | xargs -I{} cp {} ./prcpp-week0$1-jbec/src/
-                        find prcpp-week0$1 -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week0$1-jbec/
-                        find ./prcpp-week0$1-jbec -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week0$1-jbec.zip {}
-                        find ./prcpp-week0$1-jbec/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week0$1-jbec.zip {}
-                        rm -r prcpp-week0$1-jbec
+                        mkdir -p prcpp-week0$1-$NAME/src
+                        find prcpp-week0$1 -name "*.java" | xargs -I{} cp {} ./prcpp-week0$1-$NAME/src/
+                        find prcpp-week0$1 -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week0$1-$NAME/
+                        find ./prcpp-week0$1-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week0$1-$NAME.zip {}
+                        find ./prcpp-week0$1-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week0$1-$NAME.zip {}
+                        rm -r prcpp-week0$1-$NAME
                 else
                         echo "prcpp-week0$1 is not a valid directory"
                 fi
@@ -21,12 +22,12 @@ case "$1" in
 		for n in {1..10} 	
 		do
 			if [ -d "prcpp-week0$n" ]; then
-				mkdir -p prcpp-week0$n-jbec/src
-				find prcpp-week0$n -name "*.java" | xargs -I{} cp {} ./prcpp-week0$n-jbec/src/
-				find prcpp-week0$n -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week0$n-jbec/
-				find ./prcpp-week0$n-jbec -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week0$n-jbec.zip {}
-				find ./prcpp-week0$n-jbec/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week0$n-jbec.zip {}
-				rm -r prcpp-week0$n-jbec
+				mkdir -p prcpp-week0$n-$NAME/src
+				find prcpp-week0$n -name "*.java" | xargs -I{} cp {} ./prcpp-week0$n-$NAME/src/
+				find prcpp-week0$n -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week0$n-$NAME/
+				find ./prcpp-week0$n-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week0$n-$NAME.zip {}
+				find ./prcpp-week0$n-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week0$n-$NAME.zip {}
+				rm -r prcpp-week0$n-$NAME
 			else
 				break	
 			fi
