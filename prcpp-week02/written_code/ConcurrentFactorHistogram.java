@@ -16,7 +16,7 @@ public class ConcurrentFactorHistogram{
             final int thread_number = i;
 
             threads[thread_number] = new Thread(() -> {
-
+                
                 //I'm here trying to evenly distribute the load between theads.
                 for(int j = 0; j < range; j++){ 
                     if(j % nthreads == thread_number)
@@ -32,7 +32,7 @@ public class ConcurrentFactorHistogram{
             try{threads[i].join();}
             catch(Exception e){ throw new RuntimeException();}
         }
-    
+        
         int total = 0;
         for(int i = 0; i < his.getSpan(); i++){
             total += his.getCount(i);

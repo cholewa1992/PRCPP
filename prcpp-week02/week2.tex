@@ -1,0 +1,96 @@
+\documentclass{tufte-handout}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{gray75}{gray}{0.75}
+\definecolor{light-gray}{gray}{0.5}
+
+\lstset{
+frame=,
+language=java,
+aboveskip=3mm,
+belowskip=3mm,
+showstringspaces=false,
+columns=flexible,
+basicstyle={\small\ttfamily},
+numbers=none,
+numberstyle=\tiny\color{gray},
+keywordstyle=\color{blue},
+commentstyle=\color{dkgreen},
+stringstyle=\color{mauve},
+breaklines=true,
+breakatwhitespace=true
+tabsize=4
+}
+
+
+\setcounter{secnumdepth}{3}
+\renewcommand{\thesection}{}
+\renewcommand{\thesubsection}{Exercise \arabic{section}.\arabic{subsection}}
+\newcommand{\skipitem}{%
+\stepcounter{enumi}
+}
+
+\pagestyle{empty}
+
+
+\title{PRCPP week 2}
+\author{Jacob Cholewa (jbec@itu.dk)}
+
+\setcounter{section}{1}
+\begin{document}
+\maketitle
+
+\section{}
+
+
+\subsection{}
+
+\begin{enumerate}
+\item It takes $7,3$ seconds. The code can be seen in $SequentialFactorCount.java$
+\item The code can be seen in $MyAtomicInteger.java$
+\item The result is still $18,703,729$ and the runtime using $ConcurrentFactorCount.java$ is $3,5$ seconds.
+\item No. The method has to be synchronized as the addAndGet operation is atomic.
+\item The consumed time is the same. The \texttt{AtomicInteger} can, but does not have to be declared final
+
+\end{enumerate}
+
+\subsection{}
+
+\begin{enumerate}
+\item It is important as it ensured visibility of the $OneValueCache$ object between threads.
+\item As the object is already immutable (The values of $lastNumber$ and $lastFactors$ can't be changed regardless of it being $final$ or not) it is important because of visibility. The $final$ keyword ensured visibility after the constructor has finished. If the $final$ keyword is not used visibility of the objects values is not ensured between threads.
+\end{enumerate}
+
+\subsection{}
+\textit{Please see the code implemented in $ConcurrentFactorHistogram.java$}
+\begin{enumerate}
+\item $count$ should be $final$ as it will never change and because it ensures visibility. $increment$ and $getCount$ needs to be $synchronized$ to ensure visibility and because the increment operation is atomic. $getSpan$ does not have to be synchronized as $counts$ is final.
+\skipitem
+\item There is a slight advantage of using $AtomicIntegers$ with a time difference of between $100ms$ and $200ms$. 
+\item The version using $Histogram4$ return a correct result. ($diff$ against $check.out$)
+\item For $Histogram2$ I return a clone of the internal array. For $Histogram3$ and $Histogram4$ i copy the values into a new int array and return that. All three provides a snapshot.
+\end{enumerate}
+
+\subsection{}
+\begin{enumerate}
+\item Please see the code implemented in $TestCache.java$
+\item When $Memoizer1$ is used $Factorizer$ is called $115000$ times and it takes real $~18,0s$, user $~18,3s$ and sys $~0,7s$.
+\item When $Memoizer2$ is used $Factorizer$ is called $156047$ times and it takes real $~13,1s$, user $~41,8s$ and sys $~0,3s$.
+\item When $Memoizer3$ is used $Factorizer$ is called $116280$ times and it takes real $~11,2s$, user $~25,2s$ and sys $~1,1s$.
+\item When $Memoizer4$ is used $Factorizer$ is called $115000$ times and it takes real $~11,2s$, user $~24,9s$ and sys $~1,0s$.
+\item When $Memoizer5$ is used $Factorizer$ is called $115000$ times and it takes real $~11,6s$, user $~25,0s$ and sys $~1,0s$.
+\end{enumerate}
+
+
+\end{document}

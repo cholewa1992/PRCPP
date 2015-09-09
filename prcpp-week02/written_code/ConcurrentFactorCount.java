@@ -1,4 +1,3 @@
-
 import java.util.concurrent.atomic.*;
 public class ConcurrentFactorCount{
 
@@ -31,7 +30,7 @@ public class ConcurrentFactorCount{
             try{threads[i].join();}
             catch(Exception e){ throw new RuntimeException();}
         }
-    
+
         System.out.println(sum.get());
     }
 

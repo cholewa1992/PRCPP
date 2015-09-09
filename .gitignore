@@ -1,5 +1,6 @@
 # Created by https://www.gitignore.io/api/osx,java,latex,intellij,jetbrains
 
+*-jbec/
 *.pdf
 *.zip
 
