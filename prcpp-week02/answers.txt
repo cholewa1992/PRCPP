@@ -17,8 +17,15 @@
 
 2.4
 	1. Please see the code implemented in TestCache.java
-	2. When Memoizer1 is used Factorizer is called 115000 times and it takes real 18.0s, user 18.3s and sys 0.7s
-	3. When Memoizer2 is used Factorizer is called 156047 times and it takes real 13.1s, user 41.8s and sys 0.3s
-	4. When Memoizer3 is used Factorizer is called 116280 times and it takes real 11.2s, user 25.2s and sys 1.1s
-	5. When Memoizer4 is used Factorizer is called 115000 times and it takes real 11.2s, user 24.9s and sys 1.0s
-	6. When Memoizer5 is used Factorizer is called 115000 times and it takes real 11.6s, user 25.0s and sys 1.0s
+	2. Memoizer1 calls Factorizer 115000 times and it takes real 18.0s, user 18.3s and sys 0.7s
+		The method is synchronized in a way so that everything is run in serial.
+	3. Memoizer2 calls Factorizer 156047 times and it takes real 13.1s, user 41.8s and sys 0.3s
+		While a thread is computing the result of a given arg, another thread checks for a result for arg, which is not there and also begins to compute the result. Therefore Factorizer is called too many times and the run time is less than optimal.
+	4. Memoizer3 calls Factorizer 116280 times and it takes real 11.2s, user 25.2s and sys 1.1s
+		Same as above but less frequent as the Future is saved in the map and not the result.
+	5. Memoizer4 calls Factorizer 115000 times and it takes real 11.2s, user 24.9s and sys 1.0s
+		This method is correctly parallelized. 
+	6. Memoizer5 calls Factorizer 115000 times and it takes real 11.6s, user 25.0s and sys 1.0s
+		Same as above but simpler code
+	7. Memoizer0 calls Factorizer 115000 times and it takes real 11.2s, user 30.5s and sys 0.6s
+		Same as above but now using built-in functionality of ConcurrentHashMap

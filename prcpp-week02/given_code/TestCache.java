@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class TestCache {
 	public static void main(String[] args) throws InterruptedException {
 		Factorizer f = new Factorizer(); 
-		exerciseFactorizer(new Memoizer5<Long,long[]>(f)); 
+		exerciseFactorizer(new Memoizer0<Long,long[]>(f)); 
 		System.out.println(f.getCount());
 	}
 
@@ -109,12 +109,16 @@ class Memoizer0 <A, V> implements Computable<A, V> {
 	public Memoizer0(Computable<A, V> c) { this.c = c; }
 
 	public V compute(A arg) throws InterruptedException {
-		V result = cache.get(arg);
-		if (result == null) {
-			result = c.compute(arg);
-			cache.put(arg, result);
-		}
-		return result;
+		 return cache.computeIfAbsent(arg, (v) -> {
+		 	try {return c.compute(v);}
+			catch (InterruptedException e) { throw launderThrowable(e.getCause()); }
+		 });
+	}
+
+	public static RuntimeException launderThrowable(Throwable t) {
+		if (t instanceof RuntimeException) return (RuntimeException) t;
+		else if (t instanceof Error) throw (Error) t;
+		else throw new IllegalStateException("Not unchecked", t);
 	}
 }
 
