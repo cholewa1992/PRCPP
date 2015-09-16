@@ -1,9 +1,7 @@
 // Example 154 from page 123 of Java Precisely third edition (The MIT Press 2016)
 // Author: Peter Sestoft (sestoft@itu.dk)
 
-import java.util.function.BiFunction;
-import java.util.function.Consumer;  
-import java.util.function.Function;  
+import java.util.function.*;
 
 class Example154 {
   public static void main(String[] args) {
@@ -28,6 +26,24 @@ class Example154 {
        product = list8.reduce(1.0, (res, item) -> res * item);    // 12796.875
     System.out.println(sum);
     System.out.println(product);
+    System.out.println(list7.remove(13));
+    System.out.println(list7.count(t -> t == 9));
+    System.out.println(list3.filter(t -> (t & 1) == 0));
+    System.out.println(list7.removeFun(13));
+
+    FunList<FunList<Integer>> empty2 = new FunList<>(null),
+            list9 = cons(list1, cons(list2, empty2));
+
+    System.out.println(FunList.flatten(list9));
+    System.out.println(FunList.flattenFun(list9));
+
+
+    System.out.println(list1.flatMap(t -> cons(t, cons(t, cons(t, empty)))));
+    System.out.println(list1.flatMapFun(t -> cons(t, cons(t, cons(t, empty)))));
+
+    System.out.println(cons(1,cons(2,cons(3,cons(4,empty)))));
+    System.out.println(cons(1,cons(2,cons(3,cons(4,empty)))).scan((a,b) -> a*b)); //This will be equal to 4! (1*2*3*4)
+
   }
 
   public static <T> FunList<T> cons(T item, FunList<T> list) { 
@@ -96,20 +112,12 @@ class FunList<T> {
     return i == 0 ? new Node<T>(item, xs) : new Node<T>(xs.item, insert(i-1, item, xs.next));
   }
 
-  public FunList<T> remove(T x){
-    return new FunList<T>(remove(x));
-  }
-
-  protected static <T> Node<T> remove(T x, Node<T> xs){
-    return x == xs.item ? x.next : new Node<T>(xs.item, remove(x));
-  }
-
   public FunList<T> removeAt(int i) {
     return new FunList<T>(removeAt(i, this.first));
   }
 
   protected static <T> Node<T> removeAt(int i, Node<T> xs) {
-    return i == 0 ? xs.next : new Node<T>(xs.item, removeAt(i-1, xs.next));
+    return i == 0 ? xs.next : new Node<T>(xs.item, removeAt(i - 1, xs.next));
   }
 
   public FunList<T> reverse() {
@@ -177,5 +185,74 @@ class FunList<T> {
     forEach(item -> sb.append(item).append(" "));
     return sb.toString();
   }
-}
 
+
+   // My code is below
+
+  public FunList<T> remove(T x){
+    return new FunList<>(remove(x, this.first));
+  }
+
+  protected static <T> Node<T> remove(T x, Node<T> xs){
+    if(xs == null) return null;
+    return x == xs.item ? remove(x,xs.next) : new Node<>(xs.item, remove(x, xs.next));
+  }
+
+  public int count(Predicate<T> p){
+    return count(p, this.first);
+  }
+
+  protected static <T> int count(Predicate<T> p, Node<T> xs){
+    if(xs == null) return 0;
+    return count(p, xs.next) + (p.test(xs.item) ? 1 : 0);
+  }
+
+  public FunList<T> filter(Predicate<T> p){
+    return new FunList<>(filter(p, this.first));
+  }
+
+  protected static <T> Node<T> filter(Predicate<T> p, Node<T> xs){
+    if(xs == null) return null;
+    return p.test(xs.item) ? new Node<>(xs.item, filter(p,xs.next)) : filter(p, xs.next);
+  }
+
+  public FunList<T> removeFun(T x){
+    return filter(t -> t != x);
+  }
+
+  public static <T> FunList<T> flatten(FunList<FunList<T>> xss){
+    return flatten(xss.first);
+  }
+
+  protected static <T> FunList<T> flatten(Node<FunList<T>> xs){
+    return xs.next == null ? xs.item : xs.item.append(flatten(xs.next));
+  }
+
+  public static <T> FunList<T> flattenFun(FunList<FunList<T>> xss){
+    return xss.reduce(new FunList<T>(), FunList::append);
+  }
+
+  public <U> FunList<U> flatMap(Function<T, FunList<U>> f){
+    return flatMap(f, this.first);
+  }
+
+  protected <T,U> FunList<U> flatMap(Function<T, FunList<U>> f, Node<T> xs){
+    if(xs == null) return new FunList<>();
+    return f.apply(xs.item).append(flatMap(f, xs.next));
+  }
+
+  public <U> FunList<U> flatMapFun(Function<T, FunList<U>> f){
+    return flatten(this.map(t -> f.apply(t)));
+  }
+
+  public FunList<T> scan(BinaryOperator<T> f){
+    return new FunList<>(new Node<>(this.first.item, scan(f, this.first.item, this.first.next)));
+  }
+
+  protected static <T> Node<T> scan(BinaryOperator<T> f, T prev, Node<T> xs){
+    if(xs == null) return null;
+    T value = f.apply(prev, xs.item);
+    return new Node<>(value, scan(f,value, xs.next));
+  }
+
+}
