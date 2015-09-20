@@ -1,0 +1,6 @@
+#!/bin/bash
+NAME=jbec
+for n in {1..6} 	
+do
+	java Mark mark$n > mark$n.out
+done
