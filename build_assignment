@@ -1,19 +1,20 @@
 #!/bin/bash
 NAME=jbec
-function ba {
-	mkdir -p prcpp-week0$n-$NAME/src
-	mkdir -p prcpp-week0$n-$NAME/results
-	mkdir -p prcpp-week0$n-$NAME/graphs
-	find prcpp-week0$n -name "*.java" | xargs -I{} cp {} ./prcpp-week0$n-$NAME/src/
-	find prcpp-week0$n -not -name "answers.txt" -name "*.txt" | xargs -I{} cp {} ./prcpp-week0$n-$NAME/results/
-	find prcpp-week0$n -name "*.xlsx"  | xargs -I{} cp {} ./prcpp-week0$n-$NAME/graphs
-	find prcpp-week0$n -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week0$n-$NAME/
-	find ./prcpp-week0$n-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week0$n-$NAME.zip {}
-	find ./prcpp-week0$n-$NAME/graphs -maxdepth 1 -name "*.xlsx" | xargs -I{} zip -m prcpp-week0$n-$NAME.zip {}
-	find ./prcpp-week0$n-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week0$n-$NAME.zip {}
-	find ./prcpp-week0$n-$NAME/results -maxdepth 1 -name "*.txt"  | xargs -I{} zip -m prcpp-week0$n-$NAME.zip {}
+function ba() {
+	mkdir -p prcpp-week0$1-$NAME/src
+	mkdir -p prcpp-week0$1-$NAME/results
+	mkdir -p prcpp-week0$1-$NAME/graphs
+
+	find prcpp-week0$1 -name "*.java" | xargs -I{} cp {} ./prcpp-week0$1-$NAME/src/
+	find prcpp-week0$1 -not -name "answers.txt" -name "*.txt" | xargs -I{} cp {} ./prcpp-week0$1-$NAME/results/
+	find prcpp-week0$1 -name "*.xlsx"  | xargs -I{} cp {} ./prcpp-week0$1-$NAME/graphs
+	find prcpp-week0$1 -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week0$1-$NAME/
+	find ./prcpp-week0$1-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week0$1-$NAME.zip {}
+	find ./prcpp-week0$1-$NAME/graphs -maxdepth 1 -name "*.xlsx" | xargs -I{} zip -m prcpp-week0$1-$NAME.zip {}
+	find ./prcpp-week0$1-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week0$1-$NAME.zip {}
+	find ./prcpp-week0$1-$NAME/results -maxdepth 1 -name "*.txt"  | xargs -I{} zip -m prcpp-week0$1-$NAME.zip {}
+	rm -r prcpp-week0$1-$NAME
 }
-	rm -r prcpp-week0$n-$NAME
 case "$1" in
 
 	clean)
@@ -31,7 +32,7 @@ case "$1" in
 		for n in {1..10} 	
 		do
 			if [ -d "prcpp-week0$n" ]; then
-				ba $1
+				ba $n
 			else
 				break	
 			fi
