@@ -1,0 +1,37 @@
+# OS:   Mac OS X; 10.10.5; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 4 "cores"
+# Date: 2015-09-20T19:53:50+0200
+countSequential                   13179.0 us     202.92         32
+countParallelLocal      1         13186.7 us     171.94         32
+countParallelLocal      2          7970.0 us      53.62         32
+countParallelLocal      3          7072.1 us     137.88         64
+countParallelLocal      4          6158.2 us      71.24         64
+countParallelLocal      5          6792.8 us     387.17         64
+countParallelLocal      6          6482.7 us     256.21         64
+countParallelLocal      7          6043.7 us     105.67         64
+countParallelLocal      8          5955.3 us      30.33         64
+countParallelLocal      9          6204.0 us      82.03         64
+countParallelLocal     10          6069.2 us      27.41         64
+countParallelLocal     11          5913.7 us      45.83         64
+countParallelLocal     12          5918.4 us      26.38         64
+countParallelLocal     13          6102.8 us      80.11         64
+countParallelLocal     14          5999.8 us      39.86         64
+countParallelLocal     15          5945.9 us      72.96         64
+countParallelLocal     16          5971.6 us      76.84         64
+countParallelLocal     17          6048.4 us      84.75         64
+countParallelLocal     18          6006.0 us      29.85         64
+countParallelLocal     19          6022.8 us      82.56         64
+countParallelLocal     20          5993.1 us      27.96         64
+countParallelLocal     21          6089.3 us      64.20         64
+countParallelLocal     22          6056.7 us      47.22         64
+countParallelLocal     23          6073.7 us      44.34         64
+countParallelLocal     24          6051.9 us      25.98         64
+countParallelLocal     25          6552.8 us     386.48         64
+countParallelLocal     26          6200.5 us      79.07         64
+countParallelLocal     27          6219.1 us      85.29         64
+countParallelLocal     28          6267.8 us      56.16         64
+countParallelLocal     29          6428.0 us     237.34         64
+countParallelLocal     30          6277.6 us      65.42         64
+countParallelLocal     31          6285.3 us      75.67         64
+countParallelLocal     32          6225.0 us      49.88         64

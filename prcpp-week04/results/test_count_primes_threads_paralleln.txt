@@ -1,0 +1,37 @@
+# OS:   Mac OS X; 10.10.5; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 4 "cores"
+# Date: 2015-09-20T20:08:46+0200
+countSequential                   13122.2 us     259.80         32
+countParallel      1              13171.2 us     190.71         32
+countParallel      2               8093.2 us     221.66         32
+countParallel      3               6978.1 us     205.71         64
+countParallel      4               5527.5 us     124.83         64
+countParallel      5               5844.2 us      27.22         64
+countParallel      6               5626.7 us      35.68         64
+countParallel      7               5702.2 us     192.08         64
+countParallel      8               5515.4 us      29.76         64
+countParallel      9               5689.1 us      18.29         64
+countParallel     10               5647.1 us      36.88         64
+countParallel     11               5632.9 us      92.53         64
+countParallel     12               5568.0 us      45.70         64
+countParallel     13               5685.0 us      55.39         64
+countParallel     14               5654.3 us      33.82         64
+countParallel     15               5790.4 us     176.76         64
+countParallel     16               5759.9 us      90.81         64
+countParallel     17               5725.4 us      33.74         64
+countParallel     18               5730.9 us      33.68         64
+countParallel     19               5809.7 us     312.03         64
+countParallel     20               5767.4 us     150.19         64
+countParallel     21               5761.1 us      60.84         64
+countParallel     22               5776.9 us      22.96         64
+countParallel     23               5776.1 us      34.20         64
+countParallel     24               5852.0 us     206.50         64
+countParallel     25               5988.4 us     230.06         64
+countParallel     26               6036.4 us     357.80         64
+countParallel     27               6002.0 us      81.99         64
+countParallel     28               6126.9 us     260.17         64
+countParallel     29               6477.7 us     529.62         64
+countParallel     30               6379.7 us     413.39         64
+countParallel     31               6065.4 us     147.40         64
+countParallel     32               6022.7 us     240.42         64

@@ -14,7 +14,16 @@ public class Mark{
             case "mark5": mark5(); break;
             case "mark6": mark6("multiply", i -> multiply(i));
             case "mark7":
-                mark7("multiply", i -> multiply(i));
+                mark7("pow", i -> Math.pow(10.0, 0.1 * (i & 0xFF)));
+                mark7("exp", i -> Math.exp(0.1 * (i & 0xFF)));
+                mark7("log", i -> Math.log(0.1 + 0.1 * (i & 0xFF)));
+                mark7("sin", i -> Math.sin(0.1 * (i & 0xFF)));
+                mark7("cos", i -> Math.cos(0.1 * (i & 0xFF)));
+                mark7("tan", i -> Math.tan(0.1 * (i & 0xFF)));
+                mark7("asin", i -> Math.asin(1.0/256.0 * (i & 0xFF)));
+                mark7("acos", i -> Math.acos(1.0/256.0 * (i & 0xFF)));
+                mark7("atan", i -> Math.atan(1.0/256.0 * (i & 0xFF)));
+                break;
         }
 
 

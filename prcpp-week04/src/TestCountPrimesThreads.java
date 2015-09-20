@@ -3,6 +3,7 @@
 // (Much simplified from CountprimesMany.java)
 // sestoft@itu.dk * 2014-08-31, 2015-09-15
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.IntToDoubleFunction;
 
 public class TestCountPrimesThreads {
@@ -12,10 +13,10 @@ public class TestCountPrimesThreads {
     // Mark6("countSequential", i -> countSequential(range));
     // Mark6("countParallel", i -> countParallelN(range, 10));
     Mark7("countSequential", i -> countSequential(range));
-    for (int c=1; c<=100; c++) {
+    for (int c=1; c<=32; c++) {
       final int threadCount = c;
-      Mark7(String.format("countParallelLocal %6d", threadCount), 
-            i -> countParallelNLocal(range, threadCount));
+      Mark7(String.format("countParallel %6d", threadCount),
+            i -> countParallelN(range, threadCount));
     }
   }
 
@@ -39,15 +40,19 @@ public class TestCountPrimesThreads {
   // General parallel solution, using multiple threads
   private static long countParallelN(int range, int threadCount) {
     final int perThread = range / threadCount;
-    final LongCounter lc = new LongCounter();
     Thread[] threads = new Thread[threadCount];
+      final AtomicLong count = new AtomicLong();
     for (int t=0; t<threadCount; t++) {
+
       final int from = perThread * t, 
         to = (t+1==threadCount) ? range : perThread * (t+1); 
       threads[t] = new Thread(new Runnable() { public void run() {
+          long lc = 0;
         for (int i=from; i<to; i++)
           if (isPrime(i))
-            lc.increment();
+            lc++;
+          count.addAndGet(lc);
+
       }});
     }
     for (int t=0; t<threadCount; t++) 
@@ -56,7 +61,7 @@ public class TestCountPrimesThreads {
       for (int t=0; t<threadCount; t++) 
         threads[t].join();
     } catch (InterruptedException exn) { }
-    return lc.get();
+    return count.get();
   }
 
   // General parallel solution, using multiple threads
@@ -155,11 +160,10 @@ public class TestCountPrimesThreads {
 }
 
 class LongCounter {
-  private long count = 0;
-  public synchronized void increment() {
-    count = count + 1;
-  }
-  public synchronized long get() { 
-    return count; 
-  }
+    //private long count = 0;
+    //public synchronized void increment() { count = count + 1; }
+    //public synchronized long get() { return count; }
+    private AtomicLong count = new AtomicLong();
+    public void increment() { count.incrementAndGet(); }
+    public long get() { return count.get(); }
 }

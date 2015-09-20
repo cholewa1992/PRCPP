@@ -1,0 +1,12 @@
+4.1.1. The results can be seen in the files mark[1-6].txt. The results are as expected.
+4.1.2. The results can be seen in the files mark7.txt. The results are as expected.
+4.2.1. The results seams quite normal and there is no strangeness and no large variation. 
+4.2.2. The results seams quite normal and is close to the result from 4.2.1.
+4.3.1. See test_count_primes_threads.out
+4.3.2. See graph (graph.xslx)
+4.3.3. The best result is found with 12 threads. The result is quite close to equal between 4 and 36 threads. This is due to the fact that my computer has only four cores meaning only four things can be run in parallel. The best result is found at 12 threads as a result of the balance between having the same amount as threads and cores and having the workload evenly distributed between the cores and the overhead of creating and running threads. No surprises here.
+4.3.4. The results are quite the same as before. It is an beneficial to use the built-in classes as you then don’t have to implement the methods yourself and because the running time is the same.
+4.3.5. The new modified code is about 400-500us faster. 
+4.4.[1-6]. See test_cache_memorizer[0-5].txt
+4.4.7. See memorizer.xlsx. The work to be computed is increasing linearly as a function of the number of threads. As my machine has only four cores there is a limit to how much can be computed in parallel. Therefore the time consumption with more than four threads is also increasing linearly as a function of the number of threads. Memoizer0 has the largest growth rate significantly higher than the others.. Memoizer[1-5] has the same growth rate, however Memoizer[3,5] is still sightly faster.
+4.4.8. I think this experiment showed quite neatly how different cache implementations scaled.

@@ -1,0 +1,36 @@
+# OS: Mac OS X; 10.10.5; x86_64
+# JVM: Oracle Corporation; 1.8.0_60
+# CPU: null; 4 "procs"
+# Date: 2015-09-20T17:44:05+0200
+multiply                            977.3    1974.87          2
+multiply                            342.6      77.25          4
+multiply                            385.3     147.70          8
+multiply                          11901.0   36255.09         16
+multiply                            166.1      87.54         32
+multiply                             60.4      23.64         64
+multiply                             80.9      57.75        128
+multiply                             61.7      20.39        256
+multiply                             72.3       1.70        512
+multiply                             45.6       0.45       1024
+multiply                             45.3       0.16       2048
+multiply                             45.2       0.76       4096
+multiply                             37.2       1.39       8192
+multiply                             36.9       0.68      16384
+multiply                             35.3       1.06      32768
+multiply                             36.6       2.15      65536
+multiply                             38.9       5.28     131072
+multiply                             36.8       3.37     262144
+multiply                             35.9       2.04     524288
+multiply                             37.0       1.73    1048576
+multiply                             36.7       1.10    2097152
+multiply                             36.7       1.17    4194304
+multiply                             36.3       0.57    8388608
+pow                                  91.3       1.72    4194304
+exp                                  69.8       1.65    4194304
+log                                  29.9       0.42   16777216
+sin                                 156.7       3.59    2097152
+cos                                 149.1       4.16    2097152
+tan                                 181.4       4.09    2097152
+asin                                310.0      16.15    1048576
+acos                                288.3      10.54    1048576
+atan                                 68.9       1.86    4194304

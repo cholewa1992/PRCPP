@@ -1,0 +1,9 @@
+#!/bin/bash
+NAME=jbec
+mkdir -p results
+cd src
+javac TestCache.java
+for n in {0..5} 	
+do	
+	java TestCache $n > ../results/test_cache_memoizer$n.txt
+done

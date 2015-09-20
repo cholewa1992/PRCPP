@@ -1,0 +1,5 @@
+# OS: Mac OS X; 10.10.5; x86_64
+# JVM: Oracle Corporation; 1.8.0_60
+# CPU: null; 4 "procs"
+# Date: 2015-09-20T17:43:22+0200
+  36.7 ns +/-  0.715 
