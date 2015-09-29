@@ -1,0 +1,12 @@
+# OS: Mac OS X; 10.10.5; x86_64
+# JVM: Oracle Corporation; 1.8.0_60
+# CPU: null; 4 "procs"
+# Date: 2015-09-29T18:17:20+0200
+WSP: No task                       7046.6     234.50      65536
+WSP: Task c                           3.3       0.05  134217728
+WSP: Task csc                       144.5       2.73    2097152
+WSP: Task csg                     15705.5     149.25      16384
+CTP: No task                       7026.9     125.66      65536
+CTP: Task c                           5.9       0.13   67108864
+CTP: Task csc                      2711.2     885.25      65536
+CTP: Task csg                     16710.1     644.12      16384
