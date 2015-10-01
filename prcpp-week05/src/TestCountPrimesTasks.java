@@ -80,8 +80,8 @@ public class TestCountPrimesTasks {
   // General parallel solution, using multiple (Runnable) tasks
   private static long countParallelN1(int range, int taskCount) {
     final int perTask = range / taskCount;
-    //final LongCounter lc = new LongCounter();
-    final LongAdder lc = new LongAdder();
+    final LongCounter lc = new LongCounter();
+    //final LongAdder lc = new LongAdder();
     List<Future<?>> futures = new ArrayList<Future<?>>();
     for (int t=0; t<taskCount; t++) {
       final int from = perTask * t, 
@@ -100,7 +100,7 @@ public class TestCountPrimesTasks {
     } catch (ExecutionException exn) { 
       throw new RuntimeException(exn.getCause()); 
     }
-    return lc.sum();
+    return lc.get();
   }
 
   // General parallel solution, using multiple Callable<Long> tasks
