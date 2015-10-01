@@ -1,0 +1,8 @@
+221c221
+< http://www.google.com links to http://www.google.dk/setprefs?sig=0_5lndc6wm3pREK8zx4Mex2klwebQ%3D&amp;hl=fo&amp;source=homepage
+---
+> http://www.google.com links to http://www.google.dk/setprefs?sig=0_nHSJz-CHyaVPdhsw_Ct2Q0at_aw%3D&amp;hl=fo&amp;source=homepage
+226c226
+< http://www.google.com links to http://www.google.dk/setprefdomain?prefdom=US&amp;sig=__nU3F4Ze_msFMIL3D_-Kw-p08h0w%3D
+---
+> http://www.google.com links to http://www.google.dk/setprefdomain?prefdom=US&amp;sig=__5KEbXrKJ2kSfmCitVwuupBoBxaI%3D

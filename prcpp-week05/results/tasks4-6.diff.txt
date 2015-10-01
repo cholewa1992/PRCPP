@@ -1,0 +1,54 @@
+0a1,7
+> http://www.di.ku.dk links to http://www.ku.dk/
+> http://www.di.ku.dk links to http://velkommen.ku.dk/uddannelse_oversigt
+> http://www.di.ku.dk links to http://studier.ku.dk/bachelor/
+> http://www.di.ku.dk links to http://studier.ku.dk/kandidat/
+> http://www.di.ku.dk links to http://phd.ku.dk
+> http://www.di.ku.dk links to http://evu.ku.dk/
+> http://www.di.ku.dk links to http://forskning.ku.dk
+89,95d95
+< http://www.di.ku.dk links to http://www.ku.dk/
+< http://www.di.ku.dk links to http://velkommen.ku.dk/uddannelse_oversigt
+< http://www.di.ku.dk links to http://studier.ku.dk/bachelor/
+< http://www.di.ku.dk links to http://studier.ku.dk/kandidat/
+< http://www.di.ku.dk links to http://phd.ku.dk
+< http://www.di.ku.dk links to http://evu.ku.dk/
+< http://www.di.ku.dk links to http://forskning.ku.dk
+207,216d206
+< http://www.tv2.dk links to http://tv2.dk/
+< http://www.tv2.dk links to http://nyhederne.tv2.dk/?channel
+< http://www.tv2.dk links to http://sporten.tv2.dk/?channel
+< http://www.tv2.dk links to http://vejret.tv2.dk/?channel
+< http://www.tv2.dk links to http://programmer.tv2.dk/?channel
+< http://www.tv2.dk links to http://tvtid.tv2.dk/?channel
+< http://www.tv2.dk links to http://nyhederne.tv2.dk/finans/?channel
+< http://www.tv2.dk links to http://politik.tv2.dk/?channel
+< http://www.tv2.dk links to http://underholdning.tv2.dk/?channel
+< http://www.tv2.dk links to http://livsstil.tv2.dk/?channel
+221c211
+< http://www.google.com links to http://www.google.dk/setprefs?sig=0_nHSJz-CHyaVPdhsw_Ct2Q0at_aw%3D&amp;hl=fo&amp;source=homepage
+---
+> http://www.google.com links to http://www.google.dk/setprefs?sig=0_tNFxG9LO6tDEJ_OafnvBedIoGh0%3D&amp;hl=fo&amp;source=homepage
+226c216
+< http://www.google.com links to http://www.google.dk/setprefdomain?prefdom=US&amp;sig=__5KEbXrKJ2kSfmCitVwuupBoBxaI%3D
+---
+> http://www.google.com links to http://www.google.dk/setprefdomain?prefdom=US&amp;sig=__yT56du9Alxtl5q6sW-919STMLk8%3D
+272a263,272
+> http://www.tv2.dk links to http://tv2.dk/
+> http://www.tv2.dk links to http://nyhederne.tv2.dk/?channel
+> http://www.tv2.dk links to http://sporten.tv2.dk/?channel
+> http://www.tv2.dk links to http://vejret.tv2.dk/?channel
+> http://www.tv2.dk links to http://programmer.tv2.dk/?channel
+> http://www.tv2.dk links to http://tvtid.tv2.dk/?channel
+> http://www.tv2.dk links to http://nyhederne.tv2.dk/finans/?channel
+> http://www.tv2.dk links to http://politik.tv2.dk/?channel
+> http://www.tv2.dk links to http://underholdning.tv2.dk/?channel
+> http://www.tv2.dk links to http://livsstil.tv2.dk/?channel
+346d345
+< http://www.bbc.co.uk links to http://www.bbc.co.uk/iplayer/episode/b06fq2v6
+347a347
+> http://www.bbc.co.uk links to http://www.bbc.co.uk/iplayer/episode/b06fq2v6
+351c351
+< http://www.bbc.co.uk links to http://www.bbc.co.uk/programmes/p033y6w1
+---
+> http://www.bbc.co.uk links to http://www.bbc.co.uk/programmes/p033z20p

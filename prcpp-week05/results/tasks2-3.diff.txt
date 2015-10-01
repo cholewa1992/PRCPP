@@ -1,0 +1,15 @@
+221c221
+< http://www.google.com links to http://www.google.dk/setprefs?sig=0_LeVvwSjGVD9E6oxd4AQLHmkC5zs%3D&amp;hl=fo&amp;source=homepage
+---
+> http://www.google.com links to http://www.google.dk/setprefs?sig=0_5lndc6wm3pREK8zx4Mex2klwebQ%3D&amp;hl=fo&amp;source=homepage
+226c226
+< http://www.google.com links to http://www.google.dk/setprefdomain?prefdom=US&amp;sig=__BGMOm9bHQ_O0RRrjqNAy6TXRQIc%3D
+---
+> http://www.google.com links to http://www.google.dk/setprefdomain?prefdom=US&amp;sig=__nU3F4Ze_msFMIL3D_-Kw-p08h0w%3D
+345d344
+< http://www.bbc.co.uk links to http://www.bbc.co.uk/iplayer/episode/b06fq2v6
+347c346,347
+< http://www.bbc.co.uk links to http://www.bbc.co.uk/iplayer/episode/b06fzvs1
+---
+> http://www.bbc.co.uk links to http://www.bbc.co.uk/iplayer/episode/b06fq2v6
+> http://www.bbc.co.uk links to http://www.bbc.co.uk/iplayer/episode/b06fv93l

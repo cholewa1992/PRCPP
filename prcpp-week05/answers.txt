@@ -8,3 +8,8 @@
 5.3.2 See TestDownload-2.txt
 5.3.3 See TestDownload-3.txt
 5.3.4 See TestDownload-4.txt. The result is not 23 times faster, but approximately four times faster which corresponds to the number of threads on my machine. I expect that fetching 4 web pages on my four core machine will not be four times faster as there will be a lot of I/O.
+5.4.2 See tasks2.txt
+5.4.3 See tasks3.txt. I cant make it work with workStealingPool. It works with CachedTreadPool, I’m not sure why. The results are almost the same (see tasks2-3.diff.txt). The difference is the pages changing between runs. The web is fast :-)
+5.4.4 See tasks4.txt. Same as above.
+5.4.5 The code never terminates. This is due to the fact that we are using a blocking queue. Only three tasks can be run simotainiously, and as some of the tasks will never terminate, the program will never terminate.
+5.4.6 See tasks6.txt. The results are not in the same order, but the same (see task4-6.diff.txt). As the two PageGetters are running simotainiously it is not garuenteed that the results are outputtet in the same order.
