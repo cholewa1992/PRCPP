@@ -1,7 +1,7 @@
 5.1.1 See CachedThreadPool.txt
 5.1.2 See WorkStealingThreadPool.txt
 5.1.3 See ThreadPools.xlsx
-5.1.4 I was quite surprised (and also doubting the correctness of the results) to see such a performance difference between CachedThreadPool and WorkStealingThreadPool. CachedThreadPool performs significantly better. The work is computed faster with more tasks and peaks on about 40 tasks. This might be that the work is divided better between the threads when using many tasks.
+5.1.4 I was quite surprised (and also doubting the correctness of the results) to see such a performance difference between CachedThreadPool and WorkStealingThreadPool. CachedThreadPool performs significantly better. The work is computed faster with more tasks and peaks on about 40 tasks. This might be that the work is divided better between the threads when using many tasks. I’ve ended up running the tests again. The results can be seen in chart2 and all the results files with v2. Here the results are much more plausible.
 5.1.5 See CachedThreadPool_atomiclong.txt, WorkStealingThreadPool_atomiclong.txt and ThreadPools.xlsx
 5.2.[1-4] See TestTaskTime.java
 5.2.5 See TestTaskTime.txt. The results seams correct and plausible. It is fun to see that the newWorkStealingPool is here faster than the cahcedThreadPool. Also that there is such a large time difference when canceling.
