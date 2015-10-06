@@ -46,7 +46,7 @@ public class TestLongAdders {
             Mark7("NewLongAdderP " + threadCount,
                     i -> exerciseNewLongAdderPadded());
             Mark7("NewLongAdderLP " + threadCount,
-                    i -> exerciseNewLongAdderPadded());
+                    i -> exerciseNewLongAdderLessPadded());
         }
     }
 
