@@ -1,0 +1,32 @@
+# OS:   Mac OS X; 10.11; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 4 "cores"
+# Date: 2015-10-02T11:51:24+0200
+
+class SynchronizedMap
+        17 maps to B
+       117 maps to C
+        34 maps to F
+       217 maps to E
+        17 maps to B
+        17 maps to B
+       217 maps to E
+        34 maps to F
+       217 maps to E
+        17 maps to B
+        34 maps to F
+
+class StripedMap
+        17 maps to B
+       117 maps to C
+       217 maps to E
+        17 maps to B
+        34 maps to F
+        17 maps to B
+       217 maps to E
+        34 maps to F
+       217 maps to E
+        17 maps to B
+        34 maps to F
+
+class StripedWriteMap
