@@ -452,6 +452,7 @@ class StripedMap<K,V> implements OurMap<K,V> {
     // Put v at key k, or update if already present
     public V put(K k, V v) {
         final int h = getHash(k), stripe = h % lockCount;
+        int aftersize;
         synchronized (locks[stripe]) {
             final int hash = h % buckets.length;
             final ItemNode<K,V> node = ItemNode.search(buckets[hash], k);
@@ -461,28 +462,29 @@ class StripedMap<K,V> implements OurMap<K,V> {
                 return old;
             } else {
                 buckets[hash] = new ItemNode<>(k, v, buckets[hash]);
-                if (++sizes[stripe] * lockCount > buckets.length)
-                    reallocateBuckets();
-                return null;
+                aftersize = ++sizes[stripe];
             }
         }
+        if (aftersize * lockCount > buckets.length)
+            reallocateBuckets();
+        return null;
     }
 
     // Put v at key k only if absent
     public V putIfAbsent(K k, V v) {
         final int h = getHash(k), stripe = h % lockCount;
+        int aftersize;
         synchronized (locks[stripe]){
             final int hash = h % buckets.length;
             final ItemNode<K,V> node = ItemNode.search(buckets[hash],k);
-            if(node == null){
+            if(node != null) return node.v;
 
-                buckets[hash] = new ItemNode<>(k,v, buckets[hash]);
-                if (++sizes[stripe] * lockCount > buckets.length)
-                    reallocateBuckets();
-                return null;
-            }
-            return node.v;
+            buckets[hash] = new ItemNode<>(k,v, buckets[hash]);
+            aftersize = ++sizes[stripe];
         }
+        if (aftersize * lockCount > buckets.length)
+            reallocateBuckets();
+        return null;
     }
 
     // Remove and return the value at key k if any, else return null
