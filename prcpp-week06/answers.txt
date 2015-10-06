@@ -9,5 +9,8 @@
 6.2.[1,3,4] See the code
 6.2.2 Because nothing changed if nothing was added. Therefore no need for visibility guarantee.
 6.2.5 See TestStripedMap625.txt. The results are as expected as WriteStriped map is clearly the fastest compared to the other two maps we implemented. The exerciseMap method is mostly using containsKey and sometimes put and rarely remove and putIfAnset. The containsKey is, compared to the two other maps, no longer blocking resulting in the speedup. If the ratio was different, the results might also be very different, as I expect the WriteStripedMap to perform poorly with many deletes due to its immutable nature.
+6.3.1 See TestLongAdder.xlsx and TestLongAdder.txt. From the graph it clearly shows how the different implementations scale. The synchronized longCounter is as expected the slowest, this was expected as only one thread can add at the same time making the implementation thread-safe, but very slow. The other implementations are stripes in a way so that multiple threads can write at the same time, and that reflects in their performance.
+6.3.2 As seen in the graph the object allocations did not improve performance on my hardware.
+
 
 
