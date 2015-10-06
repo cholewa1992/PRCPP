@@ -1,0 +1,12 @@
+# OS:   Mac OS X; 10.11; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 4 "cores"
+# Date: 2015-10-06T09:25:04+0200
+SynchronizedMap       16         625280.1 us   42557.41          2
+99992.0
+StripedMap            16         238627.0 us   40681.03          2
+99992.0
+StripedWriteMap       16         165370.4 us   31879.81          2
+99992.0
+WrapConcHashMap       16         198803.1 us   88605.35          2
+99992.0
