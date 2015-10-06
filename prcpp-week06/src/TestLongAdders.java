@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.IntToDoubleFunction;
 
 public class TestLongAdders {
-  private static final int threadCount = 32, iterations = 1_000_000;
+  private static int threadCount = 32, iterations = 1_000;
 
   public static void main(String[] args) {
     SystemInfo();
@@ -32,16 +32,20 @@ public class TestLongAdders {
           i -> Thread.currentThread().hashCode());
     Mark7("ThreadLocalRandom", 
           i -> ThreadLocalRandom.current().nextInt());
-    Mark7("AtomicLong", 
-          i -> exerciseAtomicLong());
-    Mark7("LongAdder", 
-          i -> exerciseLongAdder());
-    Mark7("LongCounter", 
-          i -> exerciseLongCounter());
-    Mark7("NewLongAdder", 
-          i -> exerciseNewLongAdder());
-    Mark7("NewLongAdderPadded", 
-          i -> exerciseNewLongAdderPadded());
+
+      for(int n = 1; n <= 32; n++) {
+          threadCount = n;
+          Mark7("AtomicLong" + threadCount,
+                  i -> exerciseAtomicLong());
+          Mark7("LongAdder" + threadCount,
+                  i -> exerciseLongAdder());
+          Mark7("LongCounter" + threadCount,
+                  i -> exerciseLongCounter());
+          Mark7("NewLongAdder" + threadCount,
+                  i -> exerciseNewLongAdder());
+          Mark7("NewLongAdderPadded" + threadCount,
+                  i -> exerciseNewLongAdderPadded());
+      }
   }
 
   // Timing of Java's AtomicLong
