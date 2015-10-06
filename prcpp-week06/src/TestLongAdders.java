@@ -35,17 +35,17 @@ public class TestLongAdders {
 
         for(int n = 1; n <= 32; n++) {
             threadCount = n;
-            Mark7("AtomicLong" + threadCount,
+            Mark7("AtomicLong " + threadCount,
                     i -> exerciseAtomicLong());
-            Mark7("LongAdder" + threadCount,
+            Mark7("LongAdder " + threadCount,
                     i -> exerciseLongAdder());
-            Mark7("LongCounter" + threadCount,
+            Mark7("LongCounter " + threadCount,
                     i -> exerciseLongCounter());
-            Mark7("NewLongAdder" + threadCount,
+            Mark7("NewLongAdder " + threadCount,
                     i -> exerciseNewLongAdder());
-            Mark7("NewLongAdderP" + threadCount,
+            Mark7("NewLongAdderP " + threadCount,
                     i -> exerciseNewLongAdderPadded());
-            Mark7("NewLongAdderLP\t" + threadCount,
+            Mark7("NewLongAdderLP " + threadCount,
                     i -> exerciseNewLongAdderPadded());
         }
     }
