@@ -151,7 +151,7 @@ public class TestLongAdders {
     }
 
     private static double exerciseNewLongAdderLessPadded() {
-        final NewLongAdderPadded adder = new NewLongAdderPadded();
+        final NewLongAdderLessPadded adder = new NewLongAdderLessPadded();
         Thread[] threads = new Thread[threadCount];
         for (int t=0; t<threadCount; t++) {
             final int myThread = t;
