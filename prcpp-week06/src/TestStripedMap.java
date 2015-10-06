@@ -700,10 +700,10 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
             if(ItemNode.search(node, k, old)) return old.get();
             buckets[hash] = new ItemNode<>(k,v,buckets[hash]);
             afterSize = sizes.incrementAndGet(stripe);
-            if(afterSize * lockCount > buckets.length)
-                reallocateBuckets();
-            return old.get();
         }
+        if(afterSize * lockCount > buckets.length)
+            reallocateBuckets();
+        return old.get();
     }
 
     // Remove and return the value at key k if any, else return null
