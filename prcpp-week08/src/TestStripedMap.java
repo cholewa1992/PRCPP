@@ -212,14 +212,15 @@ class StripedWriteMap<K,V> implements OurMap<K,V> {
         final ItemNode<K,V>[] bs = buckets;
         final int h = getHash(k), stripe = h % lockCount, hash = h % bs.length;
         // The sizes access is necessary for visibility of bs elements
-        return sizes.get(stripe) != 0 && ItemNode.search(bs[hash], k, null);
+        //return sizes.get(stripe) != 0 && ItemNode.search(bs[hash], k, null);
+        return ItemNode.search(bs[hash], k, null);
     }
 
     // Return value v associated with key k, or null
     public V get(K k) {
         final ItemNode<K,V>[] bs = buckets;
         final int h = getHash(k), stripe = h % lockCount, hash = h % bs.length;
-        if(sizes.get(stripe) == 0) return null;
+        //if(sizes.get(stripe) == 0) return null;
         final Holder<V> holder = new Holder<>();
         ItemNode.search(bs[hash],k, holder);
         return holder.value;
