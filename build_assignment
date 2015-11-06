@@ -1,43 +1,54 @@
 #!/bin/bash
 NAME=jbec
 function ba() {
-	mkdir -p prcpp-week$1-$NAME/src
-	mkdir -p prcpp-week$1-$NAME/results
-	mkdir -p prcpp-week$1-$NAME/graphs
+mkdir -p prcpp-week$1-$NAME/src
+mkdir -p prcpp-week$1-$NAME/results
+mkdir -p prcpp-week$1-$NAME/graphs
 
-	find prcpp-week$1 -name "*.java" | xargs -I{} cp {} ./prcpp-week$1-$NAME/src/
-	find prcpp-week$1 -not -name "answers.txt" -name "*.txt" | xargs -I{} cp {} ./prcpp-week$1-$NAME/results/
-	find prcpp-week$1 -name "*.xlsx"  | xargs -I{} cp {} ./prcpp-week$1-$NAME/graphs
-	find prcpp-week$1 -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week$1-$NAME/
-	find ./prcpp-week$1-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
-	find ./prcpp-week$1-$NAME/graphs -maxdepth 1 -name "*.xlsx" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
-	find ./prcpp-week$1-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
-	find ./prcpp-week$1-$NAME/results -maxdepth 1 -name "*.txt"  | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
-	rm -r prcpp-week$1-$NAME
+find prcpp-week$1 -name "*.java" | xargs -I{} cp {} ./prcpp-week$1-$NAME/src/
+find prcpp-week$1 -not -name "answers.txt" -name "*.txt" | xargs -I{} cp {} ./prcpp-week$1-$NAME/results/
+find prcpp-week$1 -name "*.xlsx"  | xargs -I{} cp {} ./prcpp-week$1-$NAME/graphs
+find prcpp-week$1 -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week$1-$NAME/
+find ./prcpp-week$1-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
+find ./prcpp-week$1-$NAME/graphs -maxdepth 1 -name "*.xlsx" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
+find ./prcpp-week$1-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
+find ./prcpp-week$1-$NAME/results -maxdepth 1 -name "*.txt"  | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
+rm -r prcpp-week$1-$NAME
 }
 case "$1" in
 
-	clean)
-		rm -f -r *-$NAME*
-		;;
+    new)
+        if [ -d "prcpp-week$2" ]; then
+            echo "prcpp-week$2 already exists"
+        else
+            mkdir prcpp-week$2
+            cd prcpp-week$2
+            touch answers.txt
+            mkdir src
+        fi
+        ;;
 
-        [0-1][1-9]|[1-9])
-		value=$(printf "%02d" $1)
-                if [ -d "prcpp-week$value" ]; then
-			ba $value
-                else
-                        echo "prcpp-week$value is not a valid directory"
-                fi
-		;;
-	*)
-		for n in {1..14}	
-		do
-			value=$(printf "%02d" $n)
-			if [ -d "prcpp-week$value" ]; then
-				ba $value
-			else
-				break	
-			fi
-		done
-		;;
+    clean)
+        rm -f -r *-$NAME*
+        ;;
+
+    [0-1][1-9]|[1-9])
+        value=$(printf "%02d" $1)
+        if [ -d "prcpp-week$value" ]; then
+            ba $value
+        else
+            echo "prcpp-week$value is not a valid directory"
+        fi
+        ;;
+    *)
+        for n in {1..14}	
+        do
+            value=$(printf "%02d" $n)
+            if [ -d "prcpp-week$value" ]; then
+                ba $value
+            else
+                break	
+            fi
+        done
+        ;;
 esac
