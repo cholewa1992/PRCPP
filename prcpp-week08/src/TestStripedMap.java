@@ -92,11 +92,20 @@ public class TestStripedMap {
 
     private static void testMap(final OurMap<Integer, String> map){
         int n = 100000;
+
+        //Checks that the initial size of the map is 0
         assert map.size() == 0;
+
+        //Checks that the map does not contain the element about to be added
+        assert !map.containsKey(0);
 
         //Checks that an element is correctly added
         assert map.put(0,"0") == null;
+
+        //Checks that the map now contains the element just added.
         assert map.containsKey(0);
+
+        //Checks that the size was incremented when an element was added.
         assert map.size() == 1;
 
         //To test bucket reallocation
@@ -127,8 +136,12 @@ public class TestStripedMap {
         //Checks that the element is removed correctly
         map.remove(0);
         assert map.get(0) == null;
+
+        //Checks that the size is decremented when an element is removed.
         assert map.size() == n-1;
 
+        //Checks that the element is no longer contained in the map
+        assert !map.containsKey(0);
 
         map.forEach((k, v) -> {assert k.toString().equals(v);});
 
