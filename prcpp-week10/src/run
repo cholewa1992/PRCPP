@@ -3,5 +3,5 @@ set -e
 FILE=${1%.*}
 make $FILE.class
 if [ -f $FILE.class ]; then
-java -cp ~/.lib/multiverse-core-0.7.0.jar:. $FILE
+java -ea -cp ~/.lib/multiverse-core-0.7.0.jar:. $FILE
 fi

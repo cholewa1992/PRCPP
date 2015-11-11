@@ -24,6 +24,7 @@ class TestStmHistogram {
     }
 
     private static void countPrimeFactorsWithStmHistogram() {
+        final Histogram total = new StmHistogram(30);
         final Histogram histogram = new StmHistogram(30);
         final int range = 4_000_000;
         final int threadCount = 10, perThread = range / threadCount;
@@ -44,8 +45,17 @@ class TestStmHistogram {
             threads[t].start();
         }
         try { startBarrier.await(); } catch (Exception exn) { }
+        try {
+            while(stopBarrier.getNumberWaiting() < threadCount){
+                total.transferBins(histogram);
+                Thread.sleep(30);
+            } 
+            total.transferBins(histogram);
+        }
+        catch(Exception exn){ throw new RuntimeException(exn); }
         try { stopBarrier.await(); } catch (Exception exn) { }
         dump(histogram);
+        dump(total);
     }
 
     public static void dump(Histogram histogram) {
@@ -85,7 +95,7 @@ class StmHistogram implements Histogram {
     private final TxnInteger[] counts;
 
     public StmHistogram(int span) {
-        
+
         counts = new TxnInteger[span];
 
         for(int i = 0; i < span; i++)
@@ -95,7 +105,7 @@ class StmHistogram implements Histogram {
 
     public void increment(int bin) {
         atomic(() -> {
-           counts[bin].set(counts[bin].get() + 1); 
+            counts[bin].set(counts[bin].get() + 1); 
         });
     }
 
@@ -129,12 +139,14 @@ class StmHistogram implements Histogram {
     }
 
     public void transferBins(Histogram hist) {
-        atomic(() -> {
-            if(counts.length != hist.getSpan()) 
-                throw new RuntimeException("The histograms must have the same length");
-            for(int i = 0; i < counts.length; i++)
-                counts[i].set( counts[i].get() + hist.getAndClear(i) );
-        });
+        if(counts.length != hist.getSpan()) 
+            throw new RuntimeException("The histograms must have the same length"); 
+        for(int i = 0; i < counts.length; i++){
+            final int j = i;
+            atomic(() -> {
+                counts[j].set( hist.getAndClear(j) + getCount(j) );
+            });
+        }
     }
 }
 
