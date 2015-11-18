@@ -68,7 +68,7 @@ public class TestPseudoRandom {
       count *= 2;
       st = sst = 0.0;
       for (int j=0; j<n; j++) {
-        Timer t = new Timer();
+        Mark.Timer t = new Mark.Timer();
         for (int i=0; i<count; i++) 
           dummy += f.applyAsDouble(i);
         runningTime = t.check();

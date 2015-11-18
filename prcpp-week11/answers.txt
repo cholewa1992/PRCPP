@@ -1,0 +1,3 @@
+11.1.1 I will argue for the correctness of my code because I use do while compareAndSet structure for every write to the bins. In this way a write only occurs if it was not interleaved by another thread. I'm a bit unsure if visibility is ensured, but as I remember AtomicInteger ensured visibility.
+11.1.2 The CASHistogram performs significantly better with a runtime of ~1000ms vs ~1300ms. This seams reasonable as the CAS has a lot less overhead when updating a variable than the transactional implementation will have.
+11.2.1
