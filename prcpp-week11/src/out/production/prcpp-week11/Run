@@ -1,7 +1,0 @@
-#!/bin/bash
-set -e
-FILE=${1%.*}
-make $FILE.class
-if [ -f $FILE.class ]; then
-java -ea -cp ~/.lib/multiverse-core-0.7.0.jar:. $FILE
-fi
