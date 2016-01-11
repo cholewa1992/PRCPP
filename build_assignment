@@ -8,9 +8,11 @@ mkdir -p prcpp-week$1-$NAME/graphs
 find prcpp-week$1 -name "*.java" | xargs -I{} cp {} ./prcpp-week$1-$NAME/src/
 find prcpp-week$1 -not -name "answers.txt" -name "*.txt" | xargs -I{} cp {} ./prcpp-week$1-$NAME/results/
 find prcpp-week$1 -name "*.xlsx"  | xargs -I{} cp {} ./prcpp-week$1-$NAME/graphs
+find prcpp-week$1 -name "*.pdf"  | xargs -I{} cp {} ./prcpp-week$1-$NAME
 find prcpp-week$1 -name "answers.txt"  | xargs -I{} cp {} ./prcpp-week$1-$NAME/
 find ./prcpp-week$1-$NAME -maxdepth 1 -name "*.txt" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
 find ./prcpp-week$1-$NAME/graphs -maxdepth 1 -name "*.xlsx" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
+find ./prcpp-week$1-$NAME -maxdepth 1 -name "*.pdf" | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
 find ./prcpp-week$1-$NAME/src -maxdepth 1 -name "*.java"  | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
 find ./prcpp-week$1-$NAME/results -maxdepth 1 -name "*.txt"  | xargs -I{} zip -m prcpp-week$1-$NAME.zip {}
 rm -r prcpp-week$1-$NAME
