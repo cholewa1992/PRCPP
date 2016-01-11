@@ -56,13 +56,13 @@ Sum is 2000000.000000 and should be 2000000.000000
 \section{}
 The simplest way would be to make a synchronized version that guards \texttt{items} and \texttt{size} with an instance lock. This would ensure safe concurrent access to the arraylist.
 \section{}\label{sec:lock}
-While the näive approach described above makes the arraylist threadsafe, it does not allow parallel access and thus doesn't scale. Actually I expect the synchronized version to perform significantly worse when used by many threads compared to only a single thread.
+While the naïve approach described above makes the arraylist threadsafe, it does not allow parallel access and thus doesn't scale. Actually I expect the synchronized version to perform significantly worse when used by many threads compared to only a single thread.
 \section{}
 A simple answer to why the purposed pattern is not threadsafe is found in the sample given in the assignment. The example clearly shows that both \texttt{add} and \texttt{set} accesses \texttt{items} and \texttt{size}. As the methods uses different locks, concurrent access to \texttt{items} and \texttt{size} can occur making it not threadsafe.
 
 \moreFancyQuote{When thread $A$ executes a synchronized block, and subsequently thread $B$ enters a synchronized block guarded by the same lock, the values of variables that were visible to $A$ prior to releasing the lock are guaranteed to be visible to $B$ upon acquiring the lock.}{\citet[p. 37]{goetz2006java}}
+Because the methods uses different locks, visibility is also not guaranteed between threads.
 
-However, because the methods uses different locks, visibility is not guaranteed.
 \section{}
 While it is possible that a version might exist that makes this threadsafe, it will still require mutual exclusion when at least writing to \texttt{items} and \texttt{size}. I don't see many other (simple) ways than to fully lock both \texttt{items} and \texttt{size} when accessed. Thus it won't make much sense to have a lock for the methods if we either way have to lock the only two shared fields. Then we could as well just only lock those instead.
 
@@ -529,7 +529,7 @@ class MSUnboundedDoubleQueue implements BlockingDoubleQueue{
 
 \section{}
 
-This code is identical to the original MSQueue except for a \texttt{return null} substituted for a \texttt{continue} in \texttt{take}. I argue that this does not break the correctness of the algorithm (as proved in \cite{michael1996simple}) as it is the same as making two consecutive \texttt{take} calls.
+This code is identical to the original MSQueue except for a \texttt{return null} substituted for a \texttt{continue} in \texttt{take}. I argue that this does not break the correctness of the algorithm (as proved in \cite{michael1996simple}) as it is the same as making two consecutive \texttt{take} calls. \todo[inline]{Maybe elaborate?}
 
 \section{}
 \begin{lstlisting}[language={},frame={}]
@@ -584,6 +584,10 @@ class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
 }
 \end{lstlisting}
 \section{}
+This queue uses transactional memory instead of locking. It is an optimistic approach to concurrency meaning that the system will try to make the desired atomic operation. If it was successful the changes is committed, otherwise the changes are abandoned. It works by recording the state of the `universe'. It then performs the desired operation on the recorded state. If none of the variables was access during the operation the changes are committed, otherwise they are abandoned and the operation is retried. This makes it especially important that the operation has no side effect, like printing to StdOut, as the operation might run multiple times and therefore write to the output multiple times.
+
+I will argue for the correctness of the code above because all operations is done within atomic transactional blocks. Either they succeed because no concurrent write happened in the meantime, or they are retried until successful.
+
 \section{}
 \begin{lstlisting}[language={},frame={}]
 # OS:   Mac OS X; 10.11; x86_64
@@ -592,6 +596,9 @@ class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
 # Date: 2016-01-11T23:18:31+0100
 Sorting pipe                        387.5 ms      32.12          2
 \end{lstlisting}
+
+This queue implementation is the slowest so far except for the fully synchronized version (\texttt{BlockingNDoubleQueue}). While transactional memory is threadsafe, it is not fast in all cases. In cases with very heavy access to few variables, which is the case here where all methods uses \texttt{tail} and \texttt{head}, a lot of retries might occur.
+
 \chapter{} %11
 \chapter{} %12
 

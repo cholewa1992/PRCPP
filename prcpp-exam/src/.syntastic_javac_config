@@ -1,1 +1,1 @@
-let g:syntastic_java_javac_classpath = '/Users/jbec/.lib/multiverse-core-0.7.0.jar'
+let g:syntastic_java_javac_classpath = '/Users/jbec/.lib/multiverse-core-0.7.0.jar:~/.lib/scala.jar:~/.lib/akka-actor.jar'
