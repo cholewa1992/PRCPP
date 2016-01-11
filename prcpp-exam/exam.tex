@@ -224,7 +224,7 @@ The result of running the code results in a sorted list of elements as expected.
 
 The following queue implementation is a queue inspired by the one presented in the slides from lecture 5 (OneItemQueue), but instead using a cyclic array implemented with a normal array and a \texttt{head} and \texttt{tail} pointer. The pointers will loop back to zero if they get out of bound providing the cyclic behavior.
 
-\begin{lstlisting}[caption= Implementation of \texttt{BlockingNDoubleQueue} blocking fixed size queue]
+\begin{lstlisting}[caption= Implementation of the \texttt{BlockingNDoubleQueue} blocking fixed size queue]
 class BlockingNDoubleQueue implements BlockingDoubleQueue{
 
     private final double[] arr = new double[50];
@@ -239,7 +239,7 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
         arr[tail] = item;
         tail = ++tail == arr.length ? 0 : tail;
         count++;
-        this.notifyAll();
+        this.notify();
     }
 
     public synchronized double take(){
@@ -251,7 +251,7 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
         double item = arr[head];
         head = ++head == arr.length ? 0 : head;
         count --;
-        this.notifyAll();
+        this.notify();
         return item;
     }
 }
@@ -263,18 +263,90 @@ The queue presented above is threadsafe as the only two methods, \texttt{put} an
 \section{}
 Running the pipeline with the \texttt{BlockingNDoubleQueue} yields following results.
 \begin{lstlisting}[language={},frame={}]
-mac610262:src jbec$ java SortingPipeline
-# OS:   Mac OS X; 10.11; x86_64
-# JVM:  Oracle Corporation; 1.8.0_60
-# CPU:  null; 8 "cores"
-# Date: 2016-01-11T16:52:52+0100
-Sorting pipe                        470.4 ms      36.56          2
+    mac610262:src jbec$ java SortingPipeline
+    # OS:   Mac OS X; 10.11; x86_64
+    # JVM:  Oracle Corporation; 1.8.0_60
+    # CPU:  null; 8 "cores"
+    # Date: 2016-01-11T16:52:52+0100
+    Sorting pipe                        470.4 ms      36.56          2
 \end{lstlisting}
 These results are quite interesting as it becomes clear that the new queue is a performance bottleneck compared to the results from \ref{sec:sortingpipelinetests} where these results are almost 4 times slower. This might be due to that fact that this queue allows for no parallelism plausibly causing threads to be often blocked by each other.
 
 \chapter{} %7
+\section{}
+This queue implementation uses a linkedlist to make it unbounded. This means, in contrast to the previous queue, that it can hold as unlimited number of items (while available memory still, of course, is a limitation). This queue is also blocking forcing threads to wait if no elements is available in the queue.
+\begin{lstlisting}[caption= Implementation of the \texttt{UnboundedDoubleQueue} blocking queue]
+class UnboundedDoubleQueue implements BlockingDoubleQueue{
+
+    public Node head;
+    public Node tail;
+
+    public UnboundedDoubleQueue(){
+        Node n = new Node(0,null);
+        tail = head = n;
+    }
+
+    public synchronized void put(double item){
+        tail.next = new Node(item,null); //Setting next
+        tail = tail.next; //Moving tail
+
+        this.notify(); //Notifying a thread waiting for elements
+    }
+
+    public synchronized double take(){
+        while(head.next == null){
+            try{ this.wait(); }
+            catch(InterruptedException exn) { }
+        }
+
+        Node first = head;
+        head = first.next;
+        return head.value;
+    }
+
+    class Node{
+        public Node next;
+        public final double value;
+
+        public Node(double value, Node next){
+            this.next = next;
+            this.value = value;
+        }
+    }
+}
+\end{lstlisting}
+\section{}
+This implementation also follows the monitor pattern and is therefore threadsafe. In this queue, producers are never forced to wait as the queue is unbounded. Only consumers wait if there is no more elements to consume.
+\section{}
+\begin{lstlisting}[language={},frame={}]
+    mac610262:src jbec$ java SortingPipeline
+    # OS:   Mac OS X; 10.11; x86_64
+    # JVM:  Oracle Corporation; 1.8.0_60
+    # CPU:  null; 8 "cores"
+    # Date: 2016-01-11T18:01:39+0100
+    Sorting pipe                        262.1 ms      14.29          2
+\end{lstlisting}
+
+This queue performs significantly better than the previous. In the previous queue the \texttt{DoubleGenerator}, which will produce faster then the sort stages can consume, was forced to stop and wait for the queue to become non-full. In this queue the \texttt{DoubleGenerator} is never forced to wait which I suspect to be the reason for the vast speedup.
 
 \chapter{} %8
+\section{} %8.1
+\begin{lstlisting}[caption= Implementation of the \texttt{UnboundedDoubleQueue} blocking queue]
+\end{lstlisting}
+\section{} %8.2
+\section{} %8.3
+\section{} %8.4
+\section{} %8.5
+\section{} %8.6
+\begin{lstlisting}[language={},frame={}]
+mac610262:src jbec$ java SortingPipeline
+# OS:   Mac OS X; 10.11; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 8 "cores"
+# Date: 2016-01-11T18:56:06+0100
+Sorting pipe                         43.9 ms       1.52          8
+\end{lstlisting}
+\section{} %8.7
 \chapter{} %9
 \chapter{} %10
 \chapter{} %11

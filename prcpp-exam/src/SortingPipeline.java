@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.IntToDoubleFunction;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SortingPipeline {
     public static void main(String[] args) {
@@ -30,7 +31,9 @@ public class SortingPipeline {
             final BlockingDoubleQueue[] queues = new BlockingDoubleQueue[P+1];
 
             for(int i = 0; i < P+1; i++){
-                queues[i] = new BlockingNDoubleQueue();
+                //queues[i] = new BlockingNDoubleQueue();
+                //queues[i] = new UnboundedDoubleQueue();
+                queues[i] = new NoLockNDoubleQueue();
             }
 
             sortPipeline(arr, P, queues);
@@ -247,7 +250,7 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
         arr[tail] = item;
         tail = ++tail == arr.length ? 0 : tail;
         count++;
-        this.notifyAll();
+        this.notify();
     }
 
     public synchronized double take(){
@@ -259,10 +262,69 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
         double item = arr[head];
         head = ++head == arr.length ? 0 : head;
         count --;
-        this.notifyAll();
+        this.notify();
         return item;
     }
 }
+
+class UnboundedDoubleQueue implements BlockingDoubleQueue{
+    
+    public Node head;
+    public Node tail;
+
+    public UnboundedDoubleQueue(){
+        Node n = new Node(0,null);
+        tail = head = n;
+    }
+
+    public synchronized void put(double item){
+        tail.next = new Node(item,null); //Setting next
+        tail = tail.next; //Moving tail
+        
+        this.notify(); //Notifying a thread waiting for elements
+    }
+
+    public synchronized double take(){
+        while(head.next == null){
+            try{ this.wait(); }
+            catch(InterruptedException exn) { }
+        }
+        
+        Node first = head;
+        head = first.next;
+        return head.value;
+    }
+
+    class Node{
+        public Node next;
+        public final double value;
+
+        public Node(double value, Node next){
+            this.next = next;
+            this.value = value;
+        }
+    }
+}
+
+class NoLockNDoubleQueue implements BlockingDoubleQueue{
+    
+    private final double[] arr = new double[50];
+    private volatile int head = 0, tail = 0;
+
+    public void put(double item){
+        while(tail - head == arr.length){} //Spin
+        arr[tail % arr.length] = item;
+        tail++;
+    }
+
+    public double take() { 
+        while(tail - head == 0){} //Spin
+        double item = arr[head % arr.length];
+        head++;
+        return item; 
+    };
+
+} 
 
 // ----------------------------------------------------------------------
 
