@@ -3,6 +3,7 @@
 *-jbec/
 *.pdf
 *.zip
+*.swp
 
 ### OSX ###
 .DS_Store
