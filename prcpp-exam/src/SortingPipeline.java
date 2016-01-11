@@ -26,7 +26,7 @@ public class SortingPipeline {
     public static void main(String[] args) {
         SystemInfo();
         Mark7("Sorting pipe", j -> {
-            final int count = 100_000, P = 4;
+            final int count = 100_000, P = 1;
             final double[] arr = DoubleArray.randomPermutation(count);
             final BlockingDoubleQueue[] queues = new BlockingDoubleQueue[P+1];
 
@@ -322,9 +322,16 @@ class NoLockNDoubleQueue implements BlockingDoubleQueue{
         double item = arr[head % arr.length];
         head++;
         return item; 
-    };
-
+    }
 } 
+
+class MSUnboundedDoubleQueue implements BlockingDoubleQueue{
+
+
+    public void put(double item){}
+    public double take(){ return 0; }
+
+}
 
 // ----------------------------------------------------------------------
 
