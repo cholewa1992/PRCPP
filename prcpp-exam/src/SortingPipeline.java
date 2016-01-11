@@ -30,7 +30,7 @@ public class SortingPipeline {
             final BlockingDoubleQueue[] queues = new BlockingDoubleQueue[P+1];
 
             for(int i = 0; i < P+1; i++){
-                queues[i] = new WrappedArrayDoubleQueue();
+                queues[i] = new BlockingNDoubleQueue();
             }
 
             sortPipeline(arr, P, queues);
@@ -210,7 +210,7 @@ interface BlockingDoubleQueue {
 }
 
 class WrappedArrayDoubleQueue implements BlockingDoubleQueue{
-    
+
     private final ArrayBlockingQueue<Double> queue;
 
     public WrappedArrayDoubleQueue(){
@@ -232,6 +232,37 @@ class WrappedArrayDoubleQueue implements BlockingDoubleQueue{
     }
 }
 
+
+class BlockingNDoubleQueue implements BlockingDoubleQueue{
+    
+    private final double[] arr = new double[50];
+    private int head = 0, tail = 0, count = 0;
+
+    public synchronized void put(double item){
+        while(count == arr.length){
+            try{ this.wait(); }
+            catch(InterruptedException exn) { }
+        }
+        
+        arr[tail] = item;
+        tail = ++tail == arr.length ? 0 : tail;
+        count++;
+        this.notifyAll();
+    }
+
+    public synchronized double take(){
+        while(count == 0){
+            try{ this.wait(); }
+            catch(InterruptedException exn) { }
+        }
+
+        double item = arr[head];
+        head = ++head == arr.length ? 0 : head;
+        count --;
+        this.notifyAll();
+        return item;
+    }
+}
 
 // ----------------------------------------------------------------------
 
