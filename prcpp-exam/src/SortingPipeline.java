@@ -22,18 +22,29 @@ import java.util.function.IntToDoubleFunction;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
 
+//Multiverse import 
+import org.multiverse.api.references.*;
+import static org.multiverse.api.StmUtils.*;
+
+// Multiverse locking:
+import org.multiverse.api.LockMode;
+import org.multiverse.api.Txn;
+import org.multiverse.api.callables.TxnVoidCallable;
+
 public class SortingPipeline {
     public static void main(String[] args) {
         SystemInfo();
         Mark7("Sorting pipe", j -> {
-            final int count = 100_000, P = 1;
+            final int count = 100_000, P = 4;
             final double[] arr = DoubleArray.randomPermutation(count);
             final BlockingDoubleQueue[] queues = new BlockingDoubleQueue[P+1];
 
             for(int i = 0; i < P+1; i++){
                 //queues[i] = new BlockingNDoubleQueue();
                 //queues[i] = new UnboundedDoubleQueue();
-                queues[i] = new NoLockNDoubleQueue();
+                //queues[i] = new NoLockNDoubleQueue();
+                //queues[i] = new MSUnboundedDoubleQueue();
+                queues[i] = new StmBlockingNDoubleQueue();
             }
 
             sortPipeline(arr, P, queues);
@@ -237,7 +248,7 @@ class WrappedArrayDoubleQueue implements BlockingDoubleQueue{
 
 
 class BlockingNDoubleQueue implements BlockingDoubleQueue{
-    
+
     private final double[] arr = new double[50];
     private int head = 0, tail = 0, count = 0;
 
@@ -246,7 +257,7 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
             try{ this.wait(); }
             catch(InterruptedException exn) { }
         }
-        
+
         arr[tail] = item;
         tail = ++tail == arr.length ? 0 : tail;
         count++;
@@ -268,7 +279,7 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
 }
 
 class UnboundedDoubleQueue implements BlockingDoubleQueue{
-    
+
     public Node head;
     public Node tail;
 
@@ -280,7 +291,7 @@ class UnboundedDoubleQueue implements BlockingDoubleQueue{
     public synchronized void put(double item){
         tail.next = new Node(item,null); //Setting next
         tail = tail.next; //Moving tail
-        
+
         this.notify(); //Notifying a thread waiting for elements
     }
 
@@ -289,7 +300,7 @@ class UnboundedDoubleQueue implements BlockingDoubleQueue{
             try{ this.wait(); }
             catch(InterruptedException exn) { }
         }
-        
+
         Node first = head;
         head = first.next;
         return head.value;
@@ -307,7 +318,7 @@ class UnboundedDoubleQueue implements BlockingDoubleQueue{
 }
 
 class NoLockNDoubleQueue implements BlockingDoubleQueue{
-    
+
     private final double[] arr = new double[50];
     private volatile int head = 0, tail = 0;
 
@@ -327,10 +338,102 @@ class NoLockNDoubleQueue implements BlockingDoubleQueue{
 
 class MSUnboundedDoubleQueue implements BlockingDoubleQueue{
 
+    private final AtomicReference<Node> head, tail;
 
-    public void put(double item){}
-    public double take(){ return 0; }
 
+    public MSUnboundedDoubleQueue(){
+        Node sentinal = new Node(0,null);
+        head = new AtomicReference<Node>(sentinal);
+        tail = new AtomicReference<Node>(sentinal);
+    }
+
+    public void put(double item){
+        Node node = new Node(item,null);
+        while(true){
+            Node last = tail.get(), 
+                 next = last.next.get();
+            if(last == tail.get()){
+                if(next == null){
+                    if(last.next.compareAndSet(next,node)){
+                        tail.compareAndSet(last,node);
+                        return;
+                    }
+                } else {
+                    tail.compareAndSet(last,next);
+                }
+            }
+        }
+    }
+    public double take(){ 
+        while(true){
+            Node first = head.get(),
+                 last = tail.get(),
+                 next = first.next.get();
+            if(first == head.get()){
+                if(first == last){
+                    if(next == null){
+                        continue;
+                    } else {
+                        tail.compareAndSet(last,next);
+                    }
+                } else {
+                    double result = next.value;
+                    if(head.compareAndSet(first,next)){
+                        return result;
+                    }
+                }
+            }
+        }
+    }
+
+    class Node{
+        public final AtomicReference<Node> next;
+        public final double value;
+
+        public Node(double value, Node next){
+            this.next = new AtomicReference<>(next);
+            this.value = value;
+        }
+    }
+}
+
+
+class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
+    private final TxnDouble[] arr;
+    private final TxnInteger head, tail;
+
+    public StmBlockingNDoubleQueue(){
+        arr = new TxnDouble[40];
+        for(int i = 0; i < arr.length; i++){
+            arr[i] = newTxnDouble(0);
+        }
+        head = newTxnInteger(0);
+        tail = newTxnInteger(0);
+    } 
+
+    public void put(double item){
+        atomic(() -> {
+            if(tail.get() - head.get() == arr.length){
+                retry();
+            } else {
+                arr[tail.get() % arr.length].set(item);
+                tail.increment(); 
+            } 
+        });
+    }
+    public double take(){ 
+        return atomic(() -> {
+            if(tail.get() - head.get() == 0) {
+                retry();
+            } else {
+                double item = arr[head.get() % arr.length].get();
+                head.increment();
+                return item;
+            }
+            //Needed to compile. Will never be called
+            throw new RuntimeException(); 
+        });
+    }
 }
 
 // ----------------------------------------------------------------------

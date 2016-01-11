@@ -7,11 +7,11 @@
 
 // The Multiverse transactional memory library:
 import org.multiverse.api.references.*;
-import static org.multiverse.api.StmUtils.*;
+import static org.multiverse.api.stmutils.*;
 
-import org.multiverse.api.Txn;
-import org.multiverse.api.callables.TxnVoidCallable;
-import org.multiverse.api.LockMode;
+import org.multiverse.api.txn;
+import org.multiverse.api.callables.txnvoidcallable;
+import org.multiverse.api.lockmode;
 
 import java.util.Random;
 import java.util.concurrent.Callable;

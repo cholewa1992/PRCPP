@@ -212,7 +212,6 @@ mac610262:src jbec$ java SortingPipeline
 \todo{write discussion}
 
 \begin{lstlisting}[language={},frame={}]
-mac610262:src jbec$ java SortingPipeline
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
 # CPU:  null; 8 "cores"
@@ -262,7 +261,6 @@ The queue presented above is threadsafe as the only two methods, \texttt{put} an
 \section{}
 Running the pipeline with the \texttt{BlockingNDoubleQueue} yields following results.
 \begin{lstlisting}[language={},frame={}]
-mac610262:src jbec$ java SortingPipeline
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
 # CPU:  null; 8 "cores"
@@ -318,7 +316,6 @@ class UnboundedDoubleQueue implements BlockingDoubleQueue{
 This implementation also follows the monitor pattern and is therefore threadsafe. In this queue, producers are never forced to wait as the queue is unbounded. Only consumers wait if there is no more elements to consume.
 \section{}
 \begin{lstlisting}[language={},frame={}]
-mac610262:src jbec$ java SortingPipeline
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
 # CPU:  null; 8 "cores"
@@ -426,19 +423,17 @@ Lastly, removing volatile from both fields make the code go into an instant dead
 
 \section{} %8.6
 \begin{lstlisting}[language={},frame={}]
-    mac610262:src jbec$ java SortingPipeline
-    # OS:   Mac OS X; 10.11; x86_64
-    # JVM:  Oracle Corporation; 1.8.0_60
-    # CPU:  null; 8 "cores"
-    # Date: 2016-01-11T18:56:06+0100
-    Sorting pipe    43.9 ms     1.52    8
+# OS:   Mac OS X; 10.11; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 8 "cores"
+# Date: 2016-01-11T18:56:06+0100
+Sorting pipe    43.9 ms     1.52    8
 \end{lstlisting}
 \section{} %8.7
 
 
 The results with $P = 2$.
 \begin{lstlisting}[language={},frame={}, gobble=2]
-mac610262:src jbec$ java SortingPipeline
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
 # CPU:  null; 8 "cores"
@@ -465,7 +460,6 @@ The fact that $P = 2$ performs better than $P = 4$ I think is due to the fact th
 To confirm the hypothesis about $P = 8$ I executed the code to get the results for $P = 6$. I'm not expecting any drastic performance decrease because $6+2$ is the number of cores in my computer. 
 
 \begin{lstlisting}[language={},frame={}]
-mac610262:src jbec$ java SortingPipeline
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
 # CPU:  null; 8 "cores"
@@ -476,7 +470,128 @@ Sorting pipe    47.2 ms     1.54    8
 The results shows that $P = 6$ is almost as fast as $P = 4$.
 
 \chapter{} %9
+\section{}
+This is the exact version as given in exercise 12 except for the one \texttt{return null} subtituted with a \texttt{continue} in the take method.
+\begin{lstlisting}[caption=Implementation of the \texttt{MSUnboundedDoubleQueue}]
+class MSUnboundedDoubleQueue implements BlockingDoubleQueue{
+    private final AtomicReference<Node> head, tail;
+    public MSUnboundedDoubleQueue(){
+        Node sentinal = new Node(0,null);
+        head = new AtomicReference<Node>(sentinal);
+        tail = new AtomicReference<Node>(sentinal);
+    }
+    public void put(double item){
+        Node node = new Node(item,null);
+        while(true){
+            Node last = tail.get(), 
+                 next = last.next.get();
+            if(last == tail.get()){
+                if(next == null){
+                    if(last.next.compareAndSet(next,node)){
+                        tail.compareAndSet(last,node);
+                        return;
+                    }
+                } else 
+                    tail.compareAndSet(last,next);
+            }
+        }
+    }
+    public double take(){ 
+        while(true){
+            Node first = head.get(),
+                 last = tail.get(),
+                 next = first.next.get();
+            if(first == head.get()){
+                if(first == last){
+                    if(next == null)
+                         continue;
+                     else 
+                        tail.compareAndSet(last,next);
+                } else {
+                    double result = next.value;
+                    if(head.compareAndSet(first,next))
+                        return result;
+                }
+            }
+        }
+    }
+    class Node{
+        public final AtomicReference<Node> next;
+        public final double value;
+
+        public Node(double value, Node next){
+            this.next = new AtomicReference<>(next);
+            this.value = value;
+        }
+    }
+}
+\end{lstlisting}
+
+\section{}
+
+This code is identical to the original MSQueue except for a \texttt{return null} substituted for a \texttt{continue} in \texttt{take}. I argue that this does not break the correctness of the algorithm (as proved in \cite{michael1996simple}) as it is the same as making two consecutive \texttt{take} calls.
+
+\section{}
+\begin{lstlisting}[language={},frame={}]
+# OS:   Mac OS X; 10.11; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 8 "cores"
+# Date: 2016-01-11T22:41:40+0100
+Sorting pipe    71.8 ms     2.49    4
+\end{lstlisting}
+
+This queue version performs worse than the \texttt{NoLockNDoubleQueue} but better than the so far presented queues. I had expected this queue to be faster than the previous as this is unbounded. This was however not the case. The simplicity of \texttt{NoLockNDoubleQueue} compared to the \texttt{MSUnboundedDoubleQueue} might explain why it performs better.
+
 \chapter{} %10
+\section{}
+\begin{lstlisting}[caption=Implementation of the \texttt{MSUnboundedDoubleQueue}]
+class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
+    private final TxnDouble[] arr;
+    private final TxnInteger head, tail;
+
+    public StmBlockingNDoubleQueue(){
+        arr = new TxnDouble[40];
+        for(int i = 0; i < arr.length; i++){
+            arr[i] = newTxnDouble(0);
+        }
+        head = newTxnInteger(0);
+        tail = newTxnInteger(0);
+    } 
+
+    public void put(double item){
+        atomic(() -> {
+            if(tail.get() - head.get() == arr.length){
+                retry();
+            } else {
+                arr[tail.get() % arr.length].set(item);
+                tail.increment(); 
+            } 
+        });
+    }
+    public double take(){ 
+        return atomic(() -> {
+            if(tail.get() - head.get() == 0) {
+                retry();
+            } else {
+                double item = arr[head.get() % arr.length].get();
+                head.increment();
+                return item;
+            }
+            //Needed to compile. Will never be called
+            throw new RuntimeException(); 
+        });
+    }
+}
+\end{lstlisting}
+\section{}
+\section{}
+\begin{lstlisting}[language={},frame={}]
+# OS:   Mac OS X; 10.11; x86_64
+# JVM:  Oracle Corporation; 1.8.0_60
+# CPU:  null; 8 "cores"
+# Date: 2016-01-11T23:18:31+0100
+Sorting pipe                        387.5 ms      32.12          2
+\end{lstlisting}
 \chapter{} %11
 \chapter{} %12
 
