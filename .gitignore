@@ -4,6 +4,7 @@
 *.pdf
 *.zip
 *.swp
+!prcpp-exam/PRCPP-exam-jbec.pdf
 
 ### OSX ###
 .DS_Store
