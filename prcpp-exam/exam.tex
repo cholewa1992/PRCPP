@@ -39,7 +39,7 @@ public void addInstance(double x) {
     }
 }
 \end{lstlisting}
-This now ensures mutual exclusion as \texttt{sum} is now guarded by the same lock. Rerunning the code shows that the expected result and the actual result are now the same.
+This ensures mutual exclusion as \texttt{sum} is now guarded by the same lock. Rerunning the code shows that the expected result and the actual result are now the same.
 
 \begin{lstlisting}[language={}, frame={}]
 mac610262:src jbec$ java TestLocking0
@@ -54,7 +54,8 @@ Sum is 2000000.000000 and should be 2000000.000000
 
 \chapter{} %2
 \section{}
-The simplest way would be to make a synchronized version that guards \texttt{items} and \texttt{size} with an instance lock. This would ensure safe concurrent access to the arraylist.
+The simplest way would be to make a synchronized version that guards \texttt{items} and \texttt{size} with an instance lock. This would ensure safe concurrent access to the arraylist. This is implemented by adding the synchronized keyword to all methods in the class.
+
 \section{}\label{sec:lock}
 While the naïve approach described above makes the arraylist threadsafe, it does not allow parallel access and thus doesn't scale. Actually I expect the synchronized version to perform significantly worse when used by many threads compared to only a single thread.
 \section{}
@@ -64,13 +65,13 @@ A simple answer to why the purposed pattern is not threadsafe is found in the sa
 Because the methods uses different locks, visibility is also not guaranteed between threads.
 
 \section{}
-While it is possible that a version might exist that makes this threadsafe, it will still require mutual exclusion when at least writing to \texttt{items} and \texttt{size}. I don't see many other (simple) ways than to fully lock both \texttt{items} and \texttt{size} when accessed. Thus it won't make much sense to have a lock for the methods if we either way have to lock the only two shared fields. Then we could as well just only lock those instead.
+While it is possible that a version might exist that makes this threadsafe, it will still require mutual exclusion when accessing \texttt{items} and \texttt{size}. I don't see many other (simple) ways than to fully lock both \texttt{items} and \texttt{size} when accessed. Thus it won't make much sense to have a lock for the methods if we either way have to lock the only two shared fields. Then we could as well just only lock those instead.
 
 \chapter{} %3
 \section{}
 The \texttt{totalSize} field can be made threadsafe by either using an \texttt{AtomicInteger} or by having \texttt{totalSize} guarded by a static lock object. The following snippet shows how it would be implemented in the code using an \texttt{AtomicInteger}
 
-\begin{lstlisting}[frame={}]
+\begin{lstlisting}[caption=Making totalSize threadsafe using an \texttt{AtomicInteger}]
 private static AtomicInteger totalSize = new AtomicInteger();
 
 public boolean add(double x) {
@@ -90,9 +91,9 @@ public static int totalSize() {
 
 \section{}
 The \texttt{allLists} field can be make threadsafe by guarding it with a static lock object. It can be implemented in code in following way.
-\begin{lstlisting}[frame={}]
+\begin{lstlisting}[caption=Making \texttt{allLists} threadsafe by guarding it with a static lock]
 private static HashSet<DoubleArrayList> allLists = new HashSet<>();
-private static Object ListsLock = new Object();
+private static final Object ListsLock = new Object();
 
 public DoubleArrayList() {
     synchronized(ListsLock){
@@ -109,6 +110,7 @@ public static HashSet<DoubleArrayList> allLists() {
 
 \chapter{} %4
 \section{}
+The following code shows the implementation of the Sorting state implemented as described in the assignment text.
 \begin{lstlisting}[caption=Implemented code for the Sorting stage]
 static class SortingStage implements Runnable {
     private final BlockingDoubleQueue in;
@@ -144,9 +146,10 @@ static class SortingStage implements Runnable {
     }
 }
 \end{lstlisting}
-See the fully implemented \texttt{SortingPipeline.java} in appendix \todo{make ref}
+See the fully implemented \texttt{SortingPipeline.java} in appendix~\ref{lst:sortingpipeline} 
 \newpage
 \section{}
+The following code shows how the pipeline is initiated and started.
 \begin{lstlisting}[caption=Implemented code for setting up and starting stages]
 private static void sortPipeline(double[] arr, int P, BlockingDoubleQueue[] queues) {
     int n = arr.length / P;
@@ -178,6 +181,7 @@ private static void sortPipeline(double[] arr, int P, BlockingDoubleQueue[] queu
 
 \chapter{} %5
 \section{} %wrapper
+The following code wraps \texttt{ArrayBlockingQueue} so that it fits our \texttt{BlockingDoubleQueue} interface.
 \begin{lstlisting}[caption=Implemented code for wrapping \texttt{ArrayBlockingQueue}]
 class WrappedArrayDoubleQueue implements BlockingDoubleQueue{
     private final ArrayBlockingQueue<Double> queue;
@@ -209,8 +213,7 @@ mac610262:src jbec$ java SortingPipeline
 \end{lstlisting}
 \section{}\label{sec:sortingpipelinetests}
 
-\todo{write discussion}
-
+The results of benchmarking the current pipeline with $count = 100.000$ and $P = 4$. It is difficult to comment on the performance yet without having it compared to other implementations, but considering the implementation and the number of elements to sort, the results seams fair. 
 \begin{lstlisting}[language={},frame={}]
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
@@ -221,7 +224,7 @@ Sorting pipe    125.9 ms    1.71    4
 \chapter{} %6
 \section{}
 
-The following queue implementation is a queue inspired by the one presented in the slides from lecture 5 (OneItemQueue), but instead using a cyclic array implemented with a normal array and a \texttt{head} and \texttt{tail} pointer. The pointers will loop back to zero if they get out of bound providing the cyclic behavior.
+The following queue implementation is inspired by the \texttt{OneItemQueue} presented in the slides from lecture 5. It uses a cyclic array. The cyclic array is implemented using a normal array and a \texttt{head} and \texttt{tail} pointer. The pointers will loop back to zero if they get out of bound providing the cyclic behavior. The blocking is implemented using \texttt{wait} and \texttt{notify}.
 
 \begin{lstlisting}[caption= Implementation of the \texttt{BlockingNDoubleQueue} blocking fixed size queue]
 class BlockingNDoubleQueue implements BlockingDoubleQueue{
@@ -256,7 +259,7 @@ class BlockingNDoubleQueue implements BlockingDoubleQueue{
 \end{lstlisting}
 
 \section{}
-The queue presented above is threadsafe as the only two methods, \texttt{put} and \texttt{take} is synchronized. Thus  the array, the two pointers and the counter is guarded by the instance object meaning that only one thread can access them at a time. A thread can be blocked, forced to wait, if the queue is either empty or full. The thread will be forced release the lock and wait until the blocking condition is no longer met. Then the thread will again try to acquire the lock before continuing. This thereby follow the monitor pattern making it threadsafe. 
+The queue presented above is threadsafe as the only two methods, \texttt{put} and \texttt{take} is synchronized. Thus the array, the two pointers, and the counter is guarded by the instance object meaning that only one thread can access them at a time. A thread can be blocked - forced to wait - if the queue is either empty or full. The thread will be forced release the lock and wait until the blocking condition is no longer met. Then the thread will again try to acquire the lock before continuing. This thereby follow the monitor pattern making it threadsafe. 
 
 \section{}
 Running the pipeline with the \texttt{BlockingNDoubleQueue} yields following results.
@@ -267,11 +270,11 @@ Running the pipeline with the \texttt{BlockingNDoubleQueue} yields following res
 # Date: 2016-01-11T16:52:52+0100
 Sorting pipe    470.4 ms    36.56   2
 \end{lstlisting}
-These results are quite interesting as it becomes clear that the new queue is a performance bottleneck compared to the results from \ref{sec:sortingpipelinetests} where these results are almost 4 times slower. This might be due to that fact that this queue allows for no parallelism plausibly causing threads to be often blocked by each other.
+These results are quite interesting as it becomes clear that the new queue is a performance bottleneck compared to the results from \ref{sec:sortingpipelinetests} as these results are almost 4 times slower. This might be due to that fact that this queue allows for no parallelism plausibly causing threads to be often blocked by each other.
 
 \chapter{} %7
 \section{}
-This queue implementation uses a linkedlist to make it unbounded. This means, in contrast to the previous queue, that it can hold as unlimited number of items (while available memory still, of course, is a limitation). This queue is also blocking forcing threads to wait if no elements is available in the queue.
+The following code presents an unbounded queue. The queue is implemented using a linkedlist to make it unbounded.  This means, in contrast to the previous queue, that it can hold as unlimited number of items (while available memory still, of course, is a limitation). This queue is also blocking forcing threads to wait if no elements is available in the queue.
 \begin{lstlisting}[caption= Implementation of the \texttt{UnboundedDoubleQueue} blocking queue]
 class UnboundedDoubleQueue implements BlockingDoubleQueue{
 
@@ -378,7 +381,7 @@ For this example it might be the case that:
 \end{enumerate}
 \section{} %8.4
 The construct of this queue is such that only a single thread will call \texttt{put}, and another will call \texttt{take}. These are the only two threads calling the methods. Because both methods depend on knowing both \texttt{head} and \texttt{tail} to calculate if the queue is full or empty, visibility is required. 
-The two pointers is only written from one thread each; Namely, \texttt{head} is written to by the thread calling \texttt{take}, while tail is written to by the thread calling \texttt{put}. Therefore visibility is strong enough to ensure threadsafe parallel access to the two pointers. 
+The two pointers is only written from one thread each; Namely, \texttt{head} is written to by the thread calling \texttt{take}, while tail is written to by the thread calling \texttt{put}. Therefore visibility is strong enough to ensure threadsafe access to the two pointers. 
 
 Concurrent access to the same index of the double array can never happen. This is due to the fact that if $tail - head == 0$, then they will point to the same index, but only \texttt{put} can access the index due to the spin loop in \texttt{take}. In the same manor, if $tail - head == arr.length$, then they will point to the same index, but only \texttt{take} can access the index due to the spin loop in \texttt{put}.
 
@@ -414,7 +417,7 @@ Elements out of order: 79719.1 before 79719.1
 ...
 \end{lstlisting}
 
-It is clear to see that some elements was emitted more than once as the input array contains no duplicates. What is likely happening the  \texttt{head} increment is not visible to the other thread. Thus the \texttt{put} method is supposed to spin when the array is full, it might just happen that it override another element with an element already added once before.
+It is clear to see that some elements was emitted more than once as the input array contains no duplicates. What likely happens is that a \texttt{head} increment is not visible to the other thread. Thus the \texttt{put} method is supposed to spin when the array is full, it might just happen that it override another element with an element already added once before.
 
 The exact same behavior is observed when the \texttt{tail} is not volatile. This might might be due to the fact that if the thread calling \texttt{take} does not see the \texttt{tail} increment, then it might very well be that the method returns an item even though the queue is empty, which would be an item it had already returned, although it was in fact suppose to spin.
 
@@ -422,6 +425,8 @@ Lastly, removing volatile from both fields make the code go into an instant dead
 
 
 \section{} %8.6
+
+This is the results of running the current progress on the pipeline with $P=4$ (after restoring the volatile fields).
 \begin{lstlisting}[language={},frame={}]
 # OS:   Mac OS X; 10.11; x86_64
 # JVM:  Oracle Corporation; 1.8.0_60
@@ -453,7 +458,7 @@ Sorting pipe    5855.0 ms   151.62  2
 
 While the execution with $P = 2$ performed better than $P = 4$, the execution with $P = 8$ performed very poorly.
 
-First of all, the bad performance of $P = 8$ is due to the fact that we now have more stages than cores in my machine. Because every stage is not running in parallel, and the stages are being scheduled in and out, because the stages spend most of their time at halt because they quickly consumed what was left in the queue, or fill up the outgoing queue, and then spend the remaining time waiting before getting descheduled. This is of course very inefficient. 
+First of all, the bad performance of $P = 8$ is due to the fact that we now have more stages than cores in my machine. Because every stage is not running in parallel, and the stages are being scheduled in and out, the stages end up spend most of their time at halt because they quickly consumed what was left in the queue, or fill up the outgoing queue, and then spend the remaining time waiting before getting descheduled. This is of course very inefficient. 
 
 The fact that $P = 2$ performs better than $P = 4$ I think is due to the fact that there is less overhead to the computations. Passing the numbers from queue to queue and all the time reorganizing the local heap is a costly affair. Running with $P = 1$ was sightly slower than $P = 2$ with $39ms$.
 
@@ -529,7 +534,9 @@ class MSUnboundedDoubleQueue implements BlockingDoubleQueue{
 
 \section{}
 
-This code is identical to the original MSQueue except for a \texttt{return null} substituted for a \texttt{continue} in \texttt{take}. I argue that this does not break the correctness of the algorithm (as proved in \cite{michael1996simple}) as it is the same as making two consecutive \texttt{take} calls. \todo[inline]{Maybe elaborate?}
+This code is identical to the original \texttt{MSQueue} except for a \texttt{return null} substituted for a \texttt{continue} in \texttt{take}. I argue that this does not break the correctness of the algorithm (as proved in \cite{michael1996simple}) as it is the same as making two consecutive \texttt{take} calls.
+
+This small change makes the queue blocking for consumers if there is no more elements to consume. 
 
 \section{}
 \begin{lstlisting}[language={},frame={}]
@@ -544,7 +551,8 @@ This queue version performs worse than the \texttt{NoLockNDoubleQueue} but bette
 
 \chapter{} %10
 \section{}
-\begin{lstlisting}[caption=Implementation of the \texttt{MSUnboundedDoubleQueue}]
+The code below shows an implementation of a Bounded blocking queue using transactional memory.
+\begin{lstlisting}[caption=Implementation of the \texttt{StmBlockNDoubleQueue}]
 class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
     private final TxnDouble[] arr;
     private final TxnInteger head, tail;
@@ -584,9 +592,9 @@ class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
 }
 \end{lstlisting}
 \section{}
-This queue uses transactional memory instead of locking. It is an optimistic approach to concurrency meaning that the system will try to make the desired atomic operation. If it was successful the changes is committed, otherwise the changes are abandoned. It works by recording the state of the `universe'. It then performs the desired operation on the recorded state. If none of the variables was access during the operation the changes are committed, otherwise they are abandoned and the operation is retried. This makes it especially important that the operation has no side effect, like printing to StdOut, as the operation might run multiple times and therefore write to the output multiple times.
+This queue uses transactional memory instead of locking. It is an optimistic approach to concurrency meaning that the system will try to make the desired atomic operation. If it was successful the changes is committed, otherwise the changes are abandoned. It works by recording the state of the `universe'. It then performs the desired operation on the recorded state. If none of the variables was access during the operation then the changes are committed, otherwise they are abandoned and the operation is retried. This makes it especially important that the operation has no side effect, like printing to StdOut, as the operation might run multiple times and therefore write to the output multiple times.
 
-I will argue for the correctness of the code above because all operations is done within atomic transactional blocks. Either they succeed because no concurrent write happened in the meantime, or they are retried until successful.
+I will argue for the correctness of the code above because all operations is done within atomic transactional blocks, and because this is the only way of altering internal state. Either they succeed because no concurrent write happened in the meantime, or they are retried until successful.
 
 \section{}
 \begin{lstlisting}[language={},frame={}]
@@ -597,7 +605,8 @@ I will argue for the correctness of the code above because all operations is don
 Sorting pipe                        387.5 ms      32.12          2
 \end{lstlisting}
 
-This queue implementation is the slowest so far except for the fully synchronized version (\texttt{BlockingNDoubleQueue}). While transactional memory is threadsafe, it is not fast in all cases. In cases with very heavy access to few variables, which is the case here where all methods uses \texttt{tail} and \texttt{head}, a lot of retries might occur.
+This queue implementation is the slowest so far except for the fully synchronized version (\texttt{BlockingNDoubleQueue}). While transactional memory is threadsafe, it is not fast in all cases. In cases with very heavy access to few variables, which is the case here where all methods uses \texttt{tail} and \texttt{head}, a lot of retries might occur because one thread continues rapid commits continuously invalidates another threads tries on slower operations.
+
 
 \chapter{} %11
 \section{}
@@ -725,22 +734,76 @@ Press return to terminate...
 0.1, 1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1, 9.1, 10.1, 11.1, 12.1, 13.1, 14.1, 15.1, 16.1, 17.1, 18.1, 19.1, 20.1, 21.1, 22.1, 23.1, 24.1, 25.1, 26.1, 27.1, 28.1, 29.1, 30.1, 31.1, 32.1, 33.1, 34.1, 35.1, 36.1, 37.1, 38.1, 39.1, 40.1, 41.1, 42.1, 43.1, 44.1, 45.1, 46.1, 47.1, 48.1, 49.1, 50.1, 51.1, 52.1, 53.1, 54.1, 55.1, 56.1, 57.1, 58.1, 59.1, 60.1, 61.1, 62.1, 63.1, 64.1, 65.1, 66.1, 67.1, 68.1, 69.1, 70.1, 71.1, 72.1, 73.1, 74.1, 75.1, 76.1, 77.1, 78.1, 79.1, 80.1, 81.1, 82.1, 83.1, 84.1, 85.1, 86.1, 87.1, 88.1, 89.1, 90.1, 91.1, 92.1, 93.1, 94.1, 95.1, 96.1, 97.1, 98.1, 99.1,
 \end{lstlisting}
 \chapter{} %12
+\section{}
 
-\chapter*{Example}
+The implemented code is devided into two parts. A \texttt{StreamSorter} class shown in listing~\ref{lst:streamsorter}, and the initialization class shown in listing~\ref{lst:streaminit}
 
-This is code in a box
+\begin{lstlisting}[caption=\texttt{StreamSorter} class, label={lst:streamsorter}]
+class StreamSorter{
+    private double[] heap;
+    private int heapSize = 0;
 
-\begin{lstlisting}[caption=This is a caption]
+    public StreamSorter(int capacity){
+        heap = new double[capacity];
+    }
+
+    public DoubleStream pipe(double x){
+        if(heapSize < heap.length){
+            heap[heapSize++] = x;
+            DoubleArray.minheapSiftup(heap, heapSize-1, heapSize-1);
+            return DoubleStream.empty();
+        } else if (x <= heap[0]){
+            return DoubleStream.of(x);
+        } else {
+            double least = heap[0];
+            heap[0] = x;
+            DoubleArray.minheapSiftdown(heap,0,heapSize-1);
+            return DoubleStream.of(least);
+        }
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[caption=Starting method for the \texttt{StreamSorter}, label={lst:streaminit}]
+public static void main(String[] args) {
+    final int count = 60, P = 3;
+    final double[] arr = DoubleArray.randomPermutation(count);
+
+    //Combining the array stream with an infinit stream of infinity
+    DoubleStream input = DoubleStream.concat(DoubleStream.of(arr), DoubleStream.iterate(0, x -> Double.POSITIVE_INFINITY));
+
+    //Chaning the StreamSorters
+    for(int i = 0; i < P; i++){
+        input = input.flatMap(new StreamSorter(count/P)::pipe);
+    }
+
+    //Chaning the output writer
+    input.limit(count).forEach(x -> System.out.print(x + ", "));
+}
 \end{lstlisting}
 
+Running the code yielded the following output
 
-This is code in the free
-
-\begin{lstlisting}[frame={}]
+\begin{lstlisting}[language={},frame={}]
+mac610262:src jbec$ java SortingPipeline
+0.0, 0.1, 1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1, 9.1, 10.1, 11.1, 12.1, 13.1, 14.1, 15.1, 16.1, 17.1, 18.1, 19.1, 20.1, 21.1, 22.1, 23.1, 24.1, 25.1, 26.1, 27.1, 28.1, 29.1, 30.1, 31.1, 32.1, 33.1, 34.1, 35.1, 36.1, 37.1, 38.1, 39.1, 40.1, 41.1, 42.1, 43.1, 44.1, 45.1, 46.1, 47.1, 48.1, 49.1, 50.1, 51.1, 52.1, 53.1, 54.1, 55.1, 56.1, 57.1, 58.1,
 \end{lstlisting}
+
+\section{}
+The output is not at all sorted, and half of the time the program crashes with an \texttt{ArrayIndexOutOfBound} exception. Functions used with parallel streams must be stateless, but because the \texttt{StreamSorter} is stateful, it is causing the program to malfunction.
 
 \bibliographystyle{plainnat}
 \bibliography{bibliography}
+
+\titleformat{\chapter}[display]{\Huge\bfseries}{Appendix\hsp\thechapter}{0pt}{\Huge\bfseries}
+\appendix
+\chapter{SortingPipeline.java}
+\lstinputlisting[caption=Source code for SortingPipeline.java, label=lst:sortingpipeline, numbers=left]{src/SortingPipeline.java}
+
+\chapter{AkkaSortingPipeline.java}
+\lstinputlisting[caption=Source code for AkkaSortingPipeline.java, label=lst:akkasortingpipeline, numbers=left]{src/AkkaSortingPipeline.java}
+
+\chapter{TestLocking2.java}
+\lstinputlisting[caption=Source code for TestLocking2.java, numbers=left]{src/TestLocking2.java}
 
 \label{LastPage}
 \end{document}

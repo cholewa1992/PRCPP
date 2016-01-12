@@ -31,12 +31,29 @@ import org.multiverse.api.LockMode;
 import org.multiverse.api.Txn;
 import org.multiverse.api.callables.TxnVoidCallable;
 
-public class SortingPipeline {
+public class SortingPipeline { 
     public static void main(String[] args) {
+        final int count = 100_000, P = 4;
+        final double[] arr = DoubleArray.randomPermutation(count);
+
+        //Combining the array stream with an infinit stream of infinity
+        DoubleStream input = DoubleStream.concat(DoubleStream.of(arr), DoubleStream.iterate(0, x -> Double.POSITIVE_INFINITY));//.parallel();
+
+        //Chaning the StreamSorters
+        for(int i = 0; i < P; i++){
+            input = input.flatMap(new StreamSorter(count/P)::pipe);
+        }
+
+        //Chaning the output writer
+        input.limit(500).forEach(x -> System.out.print(x + ", "));
+    }
+
+    /*public static void main(String[] args) {
         SystemInfo();
         Mark7("Sorting pipe", j -> {
-            final int count = 100_000, P = 4;
+            final int count = 60, P = 4;
             final double[] arr = DoubleArray.randomPermutation(count);
+
             final BlockingDoubleQueue[] queues = new BlockingDoubleQueue[P+1];
 
             for(int i = 0; i < P+1; i++){
@@ -50,7 +67,7 @@ public class SortingPipeline {
             sortPipeline(arr, P, queues);
             return arr[0];
         });
-    }
+    }*/
 
     private static void sortPipeline(double[] arr, int P, BlockingDoubleQueue[] queues) {
         int n = arr.length / P;
@@ -439,12 +456,30 @@ class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
 // ----------------------------------------------------------------------
 
 
-class StreamPipe{
-    public static DoubleStream(double n){
-        return null;
+class StreamSorter{
+
+    private double[] heap;
+    private int heapSize = 0;
+
+    public StreamSorter(int capacity){
+        heap = new double[capacity];
+    }
+
+    public DoubleStream pipe(double x){
+        if(heapSize < heap.length){
+            heap[heapSize++] = x;
+            DoubleArray.minheapSiftup(heap, heapSize-1, heapSize-1);
+            return DoubleStream.empty();
+        } else if (x <= heap[0]){
+            return DoubleStream.of(x);
+        } else {
+            double least = heap[0];
+            heap[0] = x;
+            DoubleArray.minheapSiftdown(heap,0,heapSize-1);
+            return DoubleStream.of(least);
+        }
     }
 }
-
 
 // ----------------------------------------------------------------------
 
