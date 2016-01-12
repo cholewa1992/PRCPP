@@ -438,6 +438,16 @@ class StmBlockingNDoubleQueue implements BlockingDoubleQueue{
 
 // ----------------------------------------------------------------------
 
+
+class StreamPipe{
+    public static DoubleStream(double n){
+        return null;
+    }
+}
+
+
+// ----------------------------------------------------------------------
+
 class DoubleArray {
     public static double[] randomPermutation(int n) {
         double[] arr = fillDoubleArray(n);

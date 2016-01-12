@@ -600,6 +600,130 @@ Sorting pipe                        387.5 ms      32.12          2
 This queue implementation is the slowest so far except for the fully synchronized version (\texttt{BlockingNDoubleQueue}). While transactional memory is threadsafe, it is not fast in all cases. In cases with very heavy access to few variables, which is the case here where all methods uses \texttt{tail} and \texttt{head}, a lot of retries might occur.
 
 \chapter{} %11
+\section{}
+
+The \texttt{AkkaSortingPipeline} is composed of four classes, the main class \texttt{AkkaSortingPipeline}, the two actors \texttt{SortingActor} and \texttt{EchoActor} along with two message type \texttt{InitMessage} and \texttt{DoubleMessage}. 
+
+The main logic lies with the \texttt{SortingActor} shown in listing~\ref{lst:akkasorter}. This actor can receive two kinds of messages; An \texttt{InitMessage} telling the actor to initialize a heap with a given capacity along with the reference to the actor that it should forward too. The \texttt{DoubleMessage} is used to pass doubles between actors. When a sorter receives a \texttt{DoubleMessage} it either 1) puts it into the heap if the heap is not full, 2) forwards the double if  the value is less than the lowest value in its heap, 3) substitutes the lowest value in the heap with the just received value. It forwards the lowest value and then reorganizes it's heap. This is the exact same logic as the \texttt{SortingPipleline} from previous questions.
+
+The second actor is the \texttt{EchoActor} is the drain shown in listing~\ref{lst:akkaecho}. When it receives a \texttt{DoubleMessage} it simply writes the value to the standard output.
+
+The last important class is the start class shown in listing~\ref{lst:akkaMain}. It first sets up a pipeline between itself, the sorters and the drain before starting to emit the double values. When all double values is sent it flushes the pipeline so that echo prints the sorted list.
+\begin{lstlisting}[caption=Sorting actor of \texttt{AkkeSortingPipeline},label={lst:akkasorter}]
+class SorterActor extends UntypedActor{
+    private double[] heap;
+    private int heapSize = 0;
+    private ActorRef out;
+    public void onReceive(Object o) throws Exception{
+        if(o instanceof InitMessage){
+            InitMessage msg = (InitMessage) o; 
+            heap = new double[msg.capacity];
+            heapSize = 0;
+            out = msg.to;
+        }else if(o instanceof DoubleMessage){
+            if(heap == null) return;
+            DoubleMessage msg = (DoubleMessage) o;
+
+            if(heapSize < heap.length){
+                heap[heapSize++] = msg.value;
+                DoubleArray.minheapSiftup(heap, heapSize-1, heapSize-1);
+            } else if (msg.value <= heap[0]){
+                out.tell(msg, ActorRef.noSender());
+            } else {
+                double least = heap[0];
+                heap[0] = msg.value;
+                DoubleArray.minheapSiftdown(heap,0,heapSize-1);
+                out.tell(new DoubleMessage(least), ActorRef.noSender());
+            } 
+        }
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[caption=Messages and Echo actor of \texttt{AkkeSortingPipeline},label={lst:akkaecho}]
+class EchoActor extends UntypedActor{
+    public void onReceive(Object o) throws Exception{
+        if(o instanceof DoubleMessage){
+            DoubleMessage msg = (DoubleMessage) o;
+            System.out.print(msg.value + ", ");
+        }
+    }
+}
+
+@SuppressWarnings("serial")
+class DoubleMessage implements Serializable{
+    public final double value;
+    public DoubleMessage(double value){
+        this.value = value;
+    }
+}
+
+@SuppressWarnings("serial")
+class InitMessage implements Serializable{
+    public final ActorRef to;
+    public final int capacity;
+    public InitMessage(ActorRef to, int capacity){
+        this.to = to;
+        this.capacity = capacity;
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Starting method of \texttt{AkkeSortingPipeline}, label={lst:akkaMain}]
+public class AkkaSortingPipeline{
+    public static void main(String[] args){
+        final ActorSystem system = ActorSystem.create("AkkaSortingPipeline");
+
+        int P = 4; //Number of sorters
+        int N = 100; //Number of elements to sort
+        final double[] arr = DoubleArray.randomPermutation(N); 
+
+        //Initializing drain               
+        final ActorRef drain = system.actorOf(Props.create(EchoActor.class), "Ekko");
+
+        //Initializing sorters
+        ActorRef[] sorters = new ActorRef[P]; 
+        for(int i = 0; i < P; i++){
+            sorters[i] = system.actorOf(Props.create(SorterActor.class),"Sorter"+(i+1));
+        }
+
+        //Setting up chain
+        ActorRef prev = drain;
+        for(int i = 0; i < P; i++){
+            sorters[i].tell(new InitMessage(prev, N/P), ActorRef.noSender()); 
+            prev = sorters[i];
+        }
+
+        //Sending all elements in the double array
+        for(int i = 0; i < arr.length; i++){
+            prev.tell(new DoubleMessage(arr[i]),ActorRef.noSender());
+        }
+
+        //Flushing the pipe
+        for(int i = 0; i < arr.length; i++){
+            prev.tell(new DoubleMessage(Double.POSITIVE_INFINITY),ActorRef.noSender());
+        }
+
+        //Wait for enter before terminating
+        try {
+            System.out.println("Press return to terminate...");
+            System.in.read();
+        } catch(IOException e) {
+            e.printStackTrace();
+        } finally {
+            system.shutdown();
+        }
+    }
+}
+\end{lstlisting}
+
+
+\section{}
+The result produced is as expected as all the elements occur in ordered sequence
+\begin{lstlisting}[language={},frame={}]
+mac610262:src jbec$ java -cp scala.jar:akka-actor.jar:akka-config.jar:. AkkaSortingPipeline
+Press return to terminate...
+0.1, 1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1, 9.1, 10.1, 11.1, 12.1, 13.1, 14.1, 15.1, 16.1, 17.1, 18.1, 19.1, 20.1, 21.1, 22.1, 23.1, 24.1, 25.1, 26.1, 27.1, 28.1, 29.1, 30.1, 31.1, 32.1, 33.1, 34.1, 35.1, 36.1, 37.1, 38.1, 39.1, 40.1, 41.1, 42.1, 43.1, 44.1, 45.1, 46.1, 47.1, 48.1, 49.1, 50.1, 51.1, 52.1, 53.1, 54.1, 55.1, 56.1, 57.1, 58.1, 59.1, 60.1, 61.1, 62.1, 63.1, 64.1, 65.1, 66.1, 67.1, 68.1, 69.1, 70.1, 71.1, 72.1, 73.1, 74.1, 75.1, 76.1, 77.1, 78.1, 79.1, 80.1, 81.1, 82.1, 83.1, 84.1, 85.1, 86.1, 87.1, 88.1, 89.1, 90.1, 91.1, 92.1, 93.1, 94.1, 95.1, 96.1, 97.1, 98.1, 99.1,
+\end{lstlisting}
 \chapter{} %12
 
 \chapter*{Example}

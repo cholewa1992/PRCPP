@@ -67,8 +67,6 @@
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
 \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
-\renewcommand{\lstlistingname}{}
-
 
 \addtolength{\topmargin}{-1.5cm}
 \addtolength{\textheight}{1.5cm}
@@ -81,7 +79,8 @@
 \definecolor{gray75}{gray}{0.75}
 \definecolor{light-gray}{gray}{0.5}
 \newcommand{\hsp}{\hspace{20pt}}
-\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp}{0pt}{\Huge\bfseries}[{\titlerule[1.5pt]}]
+\titleformat{\section}{\normalfont\Large\bfseries}{}{0em}{Part \thesection}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{Question \thechapter\hsp}{0pt}{\Huge\bfseries}[{\titlerule[1.5pt]}]
 % \titlespacing*{\chapter}{0cm}{-10pt}{2em}
 \titlespacing*{\chapter}{0cm}{-20pt}{2em}
 \setcounter{secnumdepth}{3}
@@ -175,8 +174,8 @@
 	\maketitle
 }
 
-\renewcommand{\thechapter}{Question \arabic{chapter}}
-\renewcommand\thesection{Part \arabic{section}}
+%\renewcommand{\thechapter}{Question \arabic{chapter}}
+%\renewcommand\thesection{Part \arabic{section}}
 
 
 \newcommand{\fancyQuote}[2]{\begin{quote}``#1'' #2\end{quote}}
